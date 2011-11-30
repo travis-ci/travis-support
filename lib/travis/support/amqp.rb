@@ -7,7 +7,7 @@ Travis::Amqp::Consumer.class_eval do
       new(Travis::Worker.config.queue)
     end
 
-    def reporting
+    def jobs
       new('reporting.jobs')
     end
 
@@ -20,7 +20,7 @@ Travis::Amqp::Consumer.class_eval do
     end
 
     def workers
-      new('worker.status')
+      new('reporting.workers')
     end
   end
 end
@@ -31,7 +31,7 @@ Travis::Amqp::Publisher.class_eval do
       new(routing_key)
     end
 
-    def reporting
+    def jobs
       new('reporting.jobs')
     end
 
@@ -44,7 +44,7 @@ Travis::Amqp::Publisher.class_eval do
     end
 
     def workers
-      new('worker.status')
+      new('reporting.workers')
     end
   end
 end
