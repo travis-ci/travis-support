@@ -6,6 +6,13 @@ module Travis
   module Logging
     autoload :Format, 'travis/support/logging/format'
 
+    ANSI = {
+      :red    => 31,
+      :green  => 32,
+      :yellow => 33,
+      :cyan   => 36
+    }
+
     module ClassMethods
       def log_header(&block)
         block ? @log_header = block : @log_header
@@ -62,6 +69,10 @@ module Travis
       exception.backtrace.each do |line|
         logger.error(Logging::Format.wrap(self, line))
       end if exception.backtrace
+    end
+
+    def colorize(color, text)
+      "\e[#{ANSI[color]}m#{text}\e[0m"
     end
 
     def log_header
