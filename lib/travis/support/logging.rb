@@ -6,6 +6,23 @@ module Travis
   module Logging
     autoload :Format, 'travis/support/logging/format'
 
+    module ClassMethods
+      def log_header(&block)
+        block ? @log_header = block : @log_header
+      end
+
+      def log(name, options = {})
+        define_method(:"#{name}_with_log") do |*args, &block|
+          arguments = options[:params].is_a?(FalseClass) ? [] : args
+          Logging.before(options[:as], self, name, arguments) unless options[:only] == :after
+          send(:"#{name}_without_log", *args, &block).tap do |result|
+            Logging.after(options[:as], self, name) unless options[:only] == :before
+          end
+        end
+        alias_method_chain name, 'log'
+      end
+    end
+
     class << self
       def included(base)
         base.extend(ClassMethods)
@@ -49,23 +66,6 @@ module Travis
 
     def log_header
       self.class.log_header ? instance_eval(&self.class.log_header) : self.class.name.split('::').last.downcase
-    end
-
-    module ClassMethods
-      def log_header(&block)
-        block ? @log_header = block : @log_header
-      end
-
-      def log(name, options = {})
-        define_method(:"#{name}_with_log") do |*args, &block|
-          arguments = options[:params].is_a?(FalseClass) ? [] : args
-          Logging.before(options[:as], self, name, arguments) unless options[:only] == :after
-          send(:"#{name}_without_log", *args, &block).tap do |result|
-            Logging.after(options[:as], self, name) unless options[:only] == :before
-          end
-        end
-        alias_method_chain name, 'log'
-      end
     end
   end
 end

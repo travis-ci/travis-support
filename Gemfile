@@ -5,6 +5,10 @@ gem 'hashr',           '~> 0.0.18'
 gem 'multi_json',      '~> 1.0.3'
 gem 'json'
 
+platform :mri do
+  gem 'amqp',          '~> 0.8.3'
+end
+
 platform :jruby do
   gem 'hot_bunnies',   '~> 1.3.3'
   gem 'net-ssh-shell', '~> 0.2.0'

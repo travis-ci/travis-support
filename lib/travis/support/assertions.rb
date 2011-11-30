@@ -25,8 +25,3 @@ module Travis
     end
   end
 end
-
-class Module
-  def define_assertion(name)
-  end
-end

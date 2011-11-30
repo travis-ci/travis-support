@@ -1,4 +1,5 @@
 module Travis
+  autoload :Amqp,       'travis/support/amqp'
   autoload :Assertions, 'travis/support/assertions'
   autoload :Logging,    'travis/support/logging'
   autoload :Retryable,  'travis/support/retryable'
