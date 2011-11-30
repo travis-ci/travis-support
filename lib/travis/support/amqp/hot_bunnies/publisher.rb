@@ -11,7 +11,7 @@ module Travis
       end
 
       def publish(data, options = {})
-        data = MultiJson.encode(data) if data.is_a?(Hash)
+        data = MultiJson.encode(data)
         defaults = { :routing_key => routing_key, :properties => { :message_id => rand(100000000000).to_s } }
         exchange.publish(data, deep_merge(defaults, options))
       end
