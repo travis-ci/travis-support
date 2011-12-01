@@ -4,7 +4,7 @@ require "travis/support/amqp/#{amqp}"
 Travis::Amqp::Consumer.class_eval do
   class << self
     def configure
-      new('build.configure')
+      new('builds.configure')
     end
 
     def builds
@@ -32,7 +32,7 @@ end
 Travis::Amqp::Publisher.class_eval do
   class << self
     def configure
-      new('build.configure')
+      new('builds.configure')
     end
 
     def builds(routing_key)
