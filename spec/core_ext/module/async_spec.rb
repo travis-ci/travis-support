@@ -47,7 +47,7 @@ describe Async do
     sleep(0.005)
     sleeper.total_done.should == 0
 
-    sleep(0.05)
+    sleep(0.07)
     sleeper.total_done.should == 5
   end
 end
