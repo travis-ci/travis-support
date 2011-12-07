@@ -67,6 +67,11 @@ module Travis
     def log_exception(exception)
       logger.error(Logging::Format.wrap(self, "#{exception.class.name}: #{exception.message}"))
       exception.backtrace.each { |line| logger.error(Logging::Format.wrap(self, line)) } if exception.backtrace
+    rescue Exception => e
+      puts '--- FATAL ---'
+      puts 'an exception occured while logging an exception'
+      puts e.message, e.backtrace
+      puts exception.message, exception.backtrace
     end
 
     def colorize(color, text)
