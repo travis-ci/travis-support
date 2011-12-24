@@ -12,7 +12,7 @@ Travis::Amqp::Consumer.class_eval do
     end
 
     def jobs
-      new('reporting.jobs')
+      new("reporting.jobs.#{routing_key}", :exchange => { :name => 'reporting' })
     end
 
     def commands

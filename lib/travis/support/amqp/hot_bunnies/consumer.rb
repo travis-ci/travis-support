@@ -8,7 +8,8 @@ module Travis
       DEFAULTS = {
         :subscribe => { :ack => false, :blocking => false },
         :queue     => { :durable => true, :exclusive => false },
-        :channel   => { :prefetch => 1 }
+        :channel   => { :prefetch => 1 },
+        :exchange  => { :name => nil, :routing_key => nil }
       }
 
       attr_reader :name, :options, :subscription
@@ -32,7 +33,13 @@ module Travis
       protected
 
         def queue
-          @queue ||= channel.queue(name, options.queue)
+          @queue ||= begin
+            queue = channel.queue(name, options.queue)
+            if options.exchange.name
+              routing_key = options.exchange.routing_key || name
+              queue.bind(options.exchange.name, :routing_key => routing_key)
+            end
+          end
         end
 
         def channel
