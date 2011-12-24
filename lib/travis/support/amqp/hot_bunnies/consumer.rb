@@ -39,6 +39,7 @@ module Travis
               routing_key = options.exchange.routing_key || name
               queue.bind(options.exchange.name, :routing_key => routing_key)
             end
+            queue
           end
         end
 
