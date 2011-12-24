@@ -11,7 +11,7 @@ Travis::Amqp::Consumer.class_eval do
       new(Travis::Worker.config.queue)
     end
 
-    def jobs
+    def jobs(routing_key)
       new("reporting.jobs.#{routing_key}", :exchange => { :name => 'reporting' })
     end
 
