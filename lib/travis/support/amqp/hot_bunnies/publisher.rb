@@ -3,11 +3,13 @@ require 'multi_json'
 module Travis
   module Amqp
     class Publisher
-      attr_reader :routing_key, :options
+      attr_reader :name, :type, :routing_key, :options
 
       def initialize(routing_key, options = {})
         @routing_key = routing_key
-        @options = options
+        @options = options.dup
+        @name = @options.delete(:name) || ""
+        @type = @options.delete(:type) || "direct"
       end
 
       def publish(data, options = {})
@@ -19,7 +21,7 @@ module Travis
       protected
 
         def exchange
-          @exchange ||= channel.default_exchange
+          @exchange ||= channel.exchange(name, :durable => true, :auto_delete => false, :type => type)
         end
 
         def channel

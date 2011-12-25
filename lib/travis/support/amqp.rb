@@ -11,8 +11,8 @@ Travis::Amqp::Consumer.class_eval do
       new(Travis::Worker.config.queue)
     end
 
-    def jobs
-      new('reporting.jobs')
+    def jobs(routing_key)
+      new("reporting.jobs.#{routing_key}", :exchange => { :name => 'reporting' })
     end
 
     def commands
@@ -39,8 +39,8 @@ Travis::Amqp::Publisher.class_eval do
       new(routing_key)
     end
 
-    def jobs
-      new('reporting.jobs')
+    def jobs(routing_key)
+      new("reporting.jobs.#{routing_key}", :type => 'topic', :name => 'reporting')
     end
 
     def commands

@@ -29,7 +29,7 @@ module Travis
 
       def disconnect
         if connection
-          connection.close if connection.isOpen
+          connection.close if connection.open?
           @connection = nil
         end
       end
