@@ -2,6 +2,8 @@ require 'thread'
 
 class Async
   class Queue
+    include Travis::Logging
+
     attr_reader :name
     attr_reader :items
 
@@ -17,7 +19,7 @@ class Async
       block = with_lock { @items.pop }
       block.call if block
     rescue Exception => e
-      puts e.message, e.backtrace
+      log_exception(e)
     end
 
     def <<(item)

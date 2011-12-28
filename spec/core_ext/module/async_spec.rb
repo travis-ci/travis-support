@@ -22,6 +22,11 @@ describe Async do
         end
         async :"sleep_in_queue_#{queue}", :queue => queue
       end
+
+      def throw_an_error
+        raise 'bang'
+      end
+      async :throw_an_error
     end
   end
 
@@ -49,6 +54,16 @@ describe Async do
 
     sleep(0.07)
     sleeper.total_done.should == 5
+  end
+
+  it 'logs exceptions when StandardErrors are raised' do
+    io = StringIO.new
+    Travis.logger = Logger.new(io)
+
+    sleeper.throw_an_error
+
+    sleep(0.05)
+    io.string.should include('[queue] RuntimeError')
   end
 end
 
