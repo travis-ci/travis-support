@@ -62,7 +62,7 @@ describe Async do
 
     sleeper.throw_an_error
 
-    sleep(0.05)
+    sleep(0.5)
     io.string.should include('[queue] RuntimeError')
   end
 end
