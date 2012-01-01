@@ -6,8 +6,7 @@ gem 'multi_json',      '~> 1.0.3'
 gem 'json'
 
 platform :mri do
-  gem 'amq-client', :git => "git://github.com/ruby-amqp/amq-client.git"
-  gem 'amqp',       :git => "git://github.com/ruby-amqp/amqp.git"
+  gem 'amqp',          '~> 0.8.3'
 end
 
 platform :jruby do
