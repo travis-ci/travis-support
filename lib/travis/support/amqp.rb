@@ -32,7 +32,7 @@ end
 Travis::Amqp::Publisher.class_eval do
   class << self
     def configure
-      new('builds.configure')
+      new('builds.configure', :auto_recovery => true)
     end
 
     def builds(routing_key)
