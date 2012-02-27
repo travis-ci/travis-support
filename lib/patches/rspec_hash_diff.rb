@@ -3,9 +3,7 @@
 # can probably be removed once we use an rspec version that contains:
 # https://github.com/rspec/rspec-expectations/pull/60
 
-require 'gem-patching'
 
-Gem.patching('rspec', '2.8.0') do
   require 'rspec'
   require 'diff/lcs'
   require 'diff/lcs/hunk'
@@ -82,4 +80,3 @@ Gem.patching('rspec', '2.8.0') do
 
     end
   end
-end
