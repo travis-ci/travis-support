@@ -4,6 +4,7 @@ gem 'activesupport',   '~> 3.1.3'
 gem 'hashr',           '~> 0.0.18'
 gem 'multi_json',      '~> 1.0.3'
 gem 'json'
+gem 'gem-patching'
 
 platform :mri do
   gem 'amq-client',    '>= 0.9.0'
