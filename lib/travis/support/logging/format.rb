@@ -40,5 +40,13 @@ module Travis
         end
       end
     end
+
+    module FormatWithoutTimestamp
+      include Format
+
+      def self.format(severity, time, progname, msg)
+        "#{severity[0, 1]} #{msg}\n"
+      end
+    end
   end
 end

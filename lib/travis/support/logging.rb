@@ -5,6 +5,7 @@ require 'logger'
 module Travis
   module Logging
     autoload :Format, 'travis/support/logging/format'
+    autoload :FormatWithoutTimestamp, 'travis/support/logging/format'
 
     ANSI = {
       :red    => 31,
@@ -39,7 +40,7 @@ module Travis
 
       def configure(logger)
         logger.tap do
-          logger.formatter = proc { |*args| Format.format(*args) }
+          logger.formatter = proc { |*args| FormatWithoutTimestamp.format(*args) }
           logger.level = Logger.const_get(:debug.to_s.upcase) # TODO set from Travis::Worker.config or something
         end
       end
