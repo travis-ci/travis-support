@@ -1,6 +1,6 @@
 source :rubygems
 
-gem 'activesupport',   '~> 3.1.3'
+gem 'activesupport',   '~> 3.2.1'
 gem 'hashr',           '~> 0.0.18'
 gem 'multi_json',      '~> 1.0.3'
 gem 'json'
