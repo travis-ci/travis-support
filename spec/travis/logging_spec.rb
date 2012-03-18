@@ -38,6 +38,27 @@ describe Travis::Logging do
     end
   end
 
+  describe '.log_level' do
+    after :each do
+      Travis.send(:remove_const, :Worker) if defined?(Travis::Worker)
+    end
+
+    it 'returns Travis::Worker.config.log_level if defined' do
+      Travis.const_set(:Worker, Module.new)
+      Travis::Worker.stubs(:config).returns(stub(:log_level => :info))
+      Travis::Logging.log_level.should == :info
+    end
+
+    it 'returns Travis.config.log_level if defined' do
+      Travis.stubs(:config).returns(stub(:log_level => :info))
+      Travis::Logging.log_level.should == :info
+    end
+
+    it 'returns :debug by default' do
+      Travis::Logging.log_level.should == :debug
+    end
+  end
+
   describe 'log_exception' do
     let(:exception) { Exception.new('kaputt!').tap { |e| e.set_backtrace(['line 1', 'line 2']) } }
 

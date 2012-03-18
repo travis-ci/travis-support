@@ -41,7 +41,7 @@ module Travis
       def configure(logger)
         logger.tap do
           logger.formatter = proc { |*args| FormatWithoutTimestamp.format(*args) }
-          logger.level = Logger.const_get(:debug.to_s.upcase) # TODO set from Travis::Worker.config or something
+          logger.level = Logger.const_get(log_level.to_s.upcase)
         end
       end
 
@@ -51,6 +51,13 @@ module Travis
 
       def after(type, *args)
         logger.send(type || :debug, Format.after(*args))
+      end
+
+      def log_level
+        case
+        when defined?(Travis::Worker) then Travis::Worker.config.log_level
+        when defined?(Travis.config)  then Travis.config.log_level
+        end || :debug
       end
     end
 
