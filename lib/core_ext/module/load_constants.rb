@@ -14,7 +14,11 @@ class Module
         full_name = [const.name, name].join('::')
         unless skip?(full_name)
           skip_names << full_name
-          child = const.const_get(name)
+          child = begin
+            const.const_get(name)
+          rescue NameError => e
+            eval("#{const}::#{name}")
+          end
           load_constants(child) if loadable?(child)
         end
       end
