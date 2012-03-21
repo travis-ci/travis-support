@@ -1,5 +1,6 @@
 require 'bunny'
 require 'multi_json'
+require 'active_support/notifications'
 
 module Travis
   module Amqp
@@ -17,6 +18,7 @@ module Travis
         data = MultiJson.encode(data)
         defaults = { :routing_key => routing_key, :properties => { :message_id => rand(100000000000).to_s } }
         exchange.publish(data, deep_merge(defaults, options))
+        ActiveSupport::Notifications.notify('travis.amqp.message.published', data)
       end
 
       protected
