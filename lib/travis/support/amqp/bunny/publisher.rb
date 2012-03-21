@@ -1,4 +1,4 @@
-require 'amqp'
+require 'bunny'
 require 'multi_json'
 
 module Travis
@@ -22,11 +22,11 @@ module Travis
       protected
 
         def exchange
-          @exchange ||= AMQP::Exchange.new(channel, type.to_sym, name, :durable => true, :auto_delete => false)
+          @exchange ||= Bunny::Exchange.new(channel, type.to_sym, name, :durable => true, :auto_delete => false)
         end
 
         def channel
-          @channel ||= AMQP::Channel.new(Amqp.connection)
+          @channel ||= Bunny::Channel.new(Amqp.connection)
         end
 
         def deep_merge(hash, other)

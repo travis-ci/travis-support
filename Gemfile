@@ -7,7 +7,9 @@ gem 'json'
 gem 'gem-patching'
 
 platform :mri do
-  gem 'bunny'
+  gem 'amq-client',    '>= 0.9.0'
+  gem 'amqp',          '>= 0.9.0'
+  gem 'bunny',         '>= 0.7.9'
 end
 
 platform :jruby do

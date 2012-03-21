@@ -1,4 +1,5 @@
 require 'hashr'
+require 'bunny'
 
 module Travis
   module Amqp
@@ -45,7 +46,7 @@ module Travis
         end
 
         def channel
-          @channel ||= AMQP::Channel.new(Amqp.connection).prefetch(Travis.config.amqp.prefetch)
+          @channel ||= Bunny::Channel.new(Amqp.connection)
         end
 
         def deep_merge(hash, other)
