@@ -1,4 +1,4 @@
-require 'amqp'
+require 'bunny'
 require 'multi_json'
 
 module Travis
