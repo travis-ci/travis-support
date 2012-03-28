@@ -24,7 +24,7 @@ module Travis
       protected
 
         def exchange
-          @exchange ||= Bunny::Exchange.new(channel, type.to_sym, name, :durable => true, :auto_delete => false)
+          @exchange ||= Bunny::Exchange.new(channel, name, :type => type.to_sym, :durable => true, :auto_delete => false)
         end
 
         def channel
