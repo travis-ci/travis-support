@@ -16,7 +16,7 @@ module Travis
 
       def publish(data, options = {})
         data = MultiJson.encode(data)
-        defaults = { :routing_key => routing_key, :properties => { :message_id => rand(100000000000).to_s } }
+        defaults = { :key => routing_key, :properties => { :message_id => rand(100000000000).to_s } }
         exchange.publish(data, deep_merge(defaults, options))
         ActiveSupport::Notifications.publish('travis.amqp.message.published', data)
       end
