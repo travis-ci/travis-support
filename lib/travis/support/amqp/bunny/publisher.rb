@@ -24,7 +24,7 @@ module Travis
       protected
 
         def exchange
-          @exchange ||= Bunny::Exchange.new(Amqp.connection, name, :type => type.to_sym, :durable => true, :auto_delete => false)
+          @exchange ||= Amqp.connection.exchange(name, :type => type.to_sym, :durable => true, :auto_delete => false)
         end
 
         def channel
