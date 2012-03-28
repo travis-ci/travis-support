@@ -19,7 +19,7 @@ module Travis
       end
 
       def connection
-        @connection ||= Bunny.new(config).tap do |bunny|
+        @connection ||= Bunny.new(config, :spec => '09').tap do |bunny|
           bunny.start
         end
       end
