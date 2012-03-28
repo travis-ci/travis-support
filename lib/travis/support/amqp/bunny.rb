@@ -19,7 +19,9 @@ module Travis
       end
 
       def connection
-        @connection = Bunny.start(config)
+        @connection ||= Bunny.new(config).tap do |bunny|
+          bunny.start
+        end
       end
       alias :connect :connection
 
