@@ -18,7 +18,7 @@ if RUBY_PLATFORM != 'java'
     }
 
     let(:message) {
-      queue.pop
+      queue.pop(:nowait => false)
     }
 
     it "should encode the data as json" do
