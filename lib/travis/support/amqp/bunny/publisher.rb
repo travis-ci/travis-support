@@ -27,10 +27,6 @@ module Travis
           @exchange ||= Amqp.connection.exchange(name, :type => type.to_sym, :durable => true, :auto_delete => false)
         end
 
-        def channel
-          @channel ||= Bunny::Channel.new(Amqp.connection)
-        end
-
         def deep_merge(hash, other)
           hash.merge(other, &(merger = proc { |key, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : v2 }))
         end

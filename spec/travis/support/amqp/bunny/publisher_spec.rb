@@ -8,10 +8,11 @@ if RUBY_PLATFORM != 'java'
         :host => 'localhost'
       }
       connection
+      queue
     end
     let(:publisher) {Travis::Amqp::Publisher.new('reporting')}
     let(:queue) {
-      queue = connection.queue('reporting')
+      queue = connection.queue('reporting', :durable => true, :exclusive => false)
       exchange = connection.exchange('reporting.jobs.1', :durable => true, :type => :topic, :auto_delete => false)
       queue.bind(exchange, :key => 'reporting')
       queue
