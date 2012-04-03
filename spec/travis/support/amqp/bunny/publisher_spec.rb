@@ -4,7 +4,7 @@ describe Travis::Amqp::Publisher do
   let(:connection) {Travis::Amqp.connection}
   before do
     Travis::Amqp.config = {
-      host: 'localhost'
+      :host => 'localhost'
     }
     connection
   end
