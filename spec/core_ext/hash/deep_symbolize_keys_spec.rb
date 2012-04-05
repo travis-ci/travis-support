@@ -12,3 +12,11 @@ describe 'Hash#deep_symbolize_keys' do
     hash.deep_symbolize_keys.should == { :foo => [{ :bar => 'baz' }] }
   end
 end
+
+describe 'Hash#deep_symbolize_keys!' do
+  it 'replaces with deep_symbolized self' do
+    hash = { 'foo' => { 'bar' => 'baz' } }
+    hash.deep_symbolize_keys!
+    hash.should == { :foo => { :bar => 'baz' } }
+  end
+end
