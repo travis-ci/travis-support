@@ -13,6 +13,7 @@ module Travis
       def config=(config)
         config = config.dup
         config[:user] = config.delete(:username) if config[:username]
+        config[:pass] = config.delete(:password) if config[:password]
         @config = config
       end
 

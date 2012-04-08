@@ -8,5 +8,10 @@ if RUBY_PLATFORM != 'java'
       Travis::Amqp.config.should == { :user => 'user' }
     end
 
+    it "converts :password in the config to :pass" do
+      Travis::Amqp.config = { :password => 'password' }
+      Travis::Amqp.config.should == { :pass => 'password' }
+    end
+
   end
 end
