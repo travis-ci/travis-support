@@ -17,9 +17,9 @@ module Travis
       def publish(data, options = {})
         data = MultiJson.encode(data)
         exchange.publish(data, deep_merge(default_data, options))
-        increment_counter
+        track_event
       rescue StandardError => e
-        increment_counter(:failed)
+        track_event(:failed)
         nil
       end
 
@@ -37,7 +37,7 @@ module Travis
           hash.merge(other, &(merger = proc { |key, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : v2 }))
         end
 
-        def increment_counter(name = nil)
+        def track_event(name = nil)
           meter_name = 'travis.amqp.messages.published'
           meter_name = "#{meter_name}.#{name.to_s}" if name
           Metriks.meter("#{meter_name}.#{routing_key}").mark
