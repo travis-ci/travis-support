@@ -19,7 +19,7 @@ module Travis
         exchange.publish(data, deep_merge(default_data, options))
         increment_counter
       rescue StandardError => e
-        increment_counter(:failed => true)
+        increment_counter(:failed)
         nil
       end
 
@@ -37,9 +37,9 @@ module Travis
           hash.merge(other, &(merger = proc { |key, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : v2 }))
         end
 
-        def increment_counter(opts = {})
+        def increment_counter(name = nil)
           meter_name = 'travis.amqp.messages.published'
-          meter_name = "#{meter_name}.failed" if opts[:failed]
+          meter_name = "#{meter_name}.#{name.to_s}" if name
           Metriks.meter("#{meter_name}.#{routing_key}").mark
         end
     end
