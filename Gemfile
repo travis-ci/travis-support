@@ -6,6 +6,8 @@ gem 'multi_json',      '~> 1.0.3'
 gem 'json'
 gem 'gem-patching'
 
+gem 'metriks',         :git => 'git://github.com/mattmatt/metriks', :ref => 'source'
+
 platform :mri do
   gem 'amq-client',    '>= 0.9.0'
   gem 'amqp',          '>= 0.9.0'

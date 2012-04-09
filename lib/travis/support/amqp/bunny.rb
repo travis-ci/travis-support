@@ -2,8 +2,8 @@ require 'bunny'
 
 module Travis
   module Amqp
-    autoload :Consumer,  'travis/support/amqp/bunny/consumer'
     autoload :Publisher, 'travis/support/amqp/bunny/publisher'
+    autoload :Consumer,  'travis/support/amqp/bunny/consumer'
 
     class << self
       def config

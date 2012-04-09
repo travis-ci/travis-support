@@ -26,6 +26,23 @@ if RUBY_PLATFORM != 'java'
     it "defaults to a direct type" do
       publisher.type.should == "direct"
     end
+
+    it "increments a counter when a message is published" do
+      expect {
+        publisher.publish({})
+      }.to change {
+        Metriks.meter('travis.amqp.messages.published.reporting').count
+      }
+    end
+
+    it "increments a counter when a message fails to be published" do
+      MultiJson.stubs(:encode).raises(StandardError)
+      expect {
+        publisher.publish({})
+      }.to change {
+        Metriks.meter('travis.amqp.messages.published.failed.reporting').count
+      }
+    end
   end
 
 end
