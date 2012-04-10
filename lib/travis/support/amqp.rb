@@ -1,4 +1,4 @@
-amqp = RUBY_PLATFORM == 'java' ? 'hot_bunnies' : 'ruby_amqp'
+amqp = RUBY_PLATFORM == 'java' ? 'hot_bunnies' : 'bunny'
 require "travis/support/amqp/#{amqp}"
 
 Travis::Amqp::Consumer.class_eval do
