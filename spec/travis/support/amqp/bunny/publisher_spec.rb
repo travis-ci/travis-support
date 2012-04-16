@@ -14,7 +14,7 @@ if RUBY_PLATFORM != 'java'
     end
 
     before do
-      Travis::Amqp.config = { :host => 'localhost' }
+      Travis::Amqp.config = { :host => '127.0.0.1' }
     end
 
     it "encodes the data as json" do
