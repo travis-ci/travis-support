@@ -59,7 +59,7 @@ module Travis
 
           def mock!
             @requests = {}
-            WebMock.stub_request(:get, /.*/).to_return do |request|
+            WebMock.stub_request(:get, %(https?://(?!127.0.0.1|localhost))).to_return do |request|
               uri = request.uri
               request = MockRequest.new(uri)
               @requests[uri] = request
