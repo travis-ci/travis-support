@@ -34,25 +34,25 @@ describe Async do
 
   it 'processes work in a separate thread, synchronized per queue' do
     1.upto(5) do
-      sleeper.sleep_in_queue_1(0.02)
+      sleeper.sleep_in_queue_1(0.2)
     end
 
-    sleep(0.005)
+    sleep(0.05)
     sleeper.done[1].should == 0
 
     1.upto(5) do |ix|
-      sleep(0.02)
+      sleep(0.2)
       sleeper.done[1].should == ix
     end
   end
 
   it 'processes work in a separate thread, asynchronous in multiple queues' do
-    1.upto(5) { |queue| sleeper.send(:"sleep_in_queue_#{queue}", 0.05) }
+    1.upto(5) { |queue| sleeper.send(:"sleep_in_queue_#{queue}", 0.5) }
 
-    sleep(0.005)
+    sleep(0.05)
     sleeper.total_done.should == 0
 
-    sleep(0.07)
+    sleep(0.7)
     sleeper.total_done.should == 5
   end
 
