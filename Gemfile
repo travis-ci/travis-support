@@ -2,7 +2,7 @@ source :rubygems
 
 gem 'activesupport',   '~> 3.2.1'
 gem 'hashr',           '~> 0.0.20'
-gem 'multi_json',      '~> 1.0.3'
+gem 'multi_json'
 gem 'json'
 gem 'gem-patching'
 
