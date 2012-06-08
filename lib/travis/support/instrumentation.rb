@@ -1,4 +1,5 @@
 require 'active_support/notifications'
+require 'active_support/core_ext/string/inflections'
 require 'core_ext/module/prepend_to'
 require 'metriks'
 
@@ -12,19 +13,23 @@ module Travis
       end
     end
 
-    def instrument(name)
+    def instrument(name, options = {})
       prepend_to(name) do |object, method, *args, &block|
-        event = object.class.name.underscore.split('/').reverse
-        event = [name, *event].join('.')
+        namespace = object.class.name.underscore.split('/').reverse
+        scope = options[:scope] ? object.send(options[:scope]) : nil
+        event = [name, scope, *namespace].compact.join('.')
         ActiveSupport::Notifications.instrument(event, :target => object, :args => args) do
           method.call(*args, &block)
         end
       end
 
-      event = self.name.underscore.split('/').reverse.join('.')
-      event = /^#{name}\.(.*\.)?#{event}$/
-      ActiveSupport::Notifications.subscribe(event, &Instrumentation.method(:consume))
+      # TODO how to ask AS::Notifications if we're subscribed?
+      unless @subscribed
+        namespace = self.name.underscore.split('/').reverse.join('.')
+        event = /^#{name}\.(.*\.)?#{namespace}$/
+        ActiveSupport::Notifications.subscribe(event, &Instrumentation.method(:consume))
+        @subscribed = true
+      end
     end
   end
 end
-

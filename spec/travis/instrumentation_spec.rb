@@ -12,7 +12,11 @@ describe Travis::Instrumentation do
       def call(*args)
         'call'
       end
-      instrument :call
+      instrument :call, :scope => :scope
+
+      def scope
+        'baz'
+      end
     end
   end
 
@@ -24,7 +28,7 @@ describe Travis::Instrumentation do
   end
 
   it 'instruments the method' do
-    ActiveSupport::Notifications.expects(:instrument).with('call.bar.foo.travis', :target => object, :args => ['foo'])
+    ActiveSupport::Notifications.expects(:instrument).with('call.baz.bar.foo.travis', :target => object, :args => ['foo'])
     object.call('foo')
   end
 
