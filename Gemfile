@@ -27,7 +27,6 @@ group :test do
   gem 'mocha'
   gem 'rspec'
   gem 'simplecov',     '>= 0.4.0', :require => false
-  gem 'activerecord'
 end
 
 
