@@ -1,5 +1,6 @@
 source :rubygems
 
+gem 'activerecord',    '~> 3.2.1'
 gem 'activesupport',   '~> 3.2.1'
 gem 'hashr',           '~> 0.0.20'
 gem 'multi_json'
@@ -7,6 +8,7 @@ gem 'json'
 gem 'gem-patching'
 
 gem 'metriks',         :git => 'git://github.com/mattmatt/metriks', :ref => 'source'
+gem 'hubble',          :git => 'git://github.com/mattmatt/hubble'
 
 platform :mri do
   gem 'amq-client',    '>= 0.9.0'

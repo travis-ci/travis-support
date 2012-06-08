@@ -18,9 +18,9 @@ describe 'Module.prepend_to' do
   let(:method) { klass.instance_method(:foo) }
 
   def prepend!(arg = nil)
-    klass.prepend_to :foo do |_super, *args|
+    klass.prepend_to :foo do |object, method, *args|
       object.called << arg
-      _super.call(*args)
+      method.call(*args)
     end
   end
 
