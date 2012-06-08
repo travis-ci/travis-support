@@ -21,7 +21,7 @@ module Travis
         end
       end
 
-      ActiveSupport::Notifications.subscribe(event, &Instrumentation.method(:consume))
+      ActiveSupport::Notifications.subscribe(/#{event}$/, &Instrumentation.method(:consume))
     end
   end
 end
