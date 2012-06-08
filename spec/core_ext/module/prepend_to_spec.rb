@@ -24,16 +24,6 @@ describe 'Module.prepend_to' do
     end
   end
 
-  it 'pushes the implementation down to a module' do
-    prepend!
-    klass.included_modules.first.instance_method(:foo).should_not be_nil
-  end
-
-  it 'defines the new method on the given module' do
-    prepend!
-    klass.instance_method(:foo).should_not be_nil
-  end
-
   it 'calls the given method first and the original method second' do
     prepend!(:prepended)
     object.foo
