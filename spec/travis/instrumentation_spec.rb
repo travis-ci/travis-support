@@ -9,10 +9,10 @@ describe Travis::Instrumentation do
         'Travis::Foo::Bar'
       end
 
-      def foo(*args)
-        'foo'
+      def call(*args)
+        'call'
       end
-      instrument :foo
+      instrument :call
     end
   end
 
@@ -24,21 +24,21 @@ describe Travis::Instrumentation do
   end
 
   it 'instruments the method' do
-    ActiveSupport::Notifications.expects(:instrument).with('bar.foo.travis', :target => object, :args => ['bar'])
-    object.foo('bar')
+    ActiveSupport::Notifications.expects(:instrument).with('call.bar.foo.travis', :target => object, :args => ['foo'])
+    object.call('foo')
   end
 
-  it 'subscribes to an AS::Notification event' do
-    ActiveSupport::Notifications.expects(:subscribe).with('bar.foo.travis')
-    object.foo
+  it 'subscribes to AS::Notification events on this class and namespaced classes' do
+    ActiveSupport::Notifications.expects(:subscribe).with(/^call\.(.*\.)?bar.foo.travis$/)
+    object.call
   end
 
   it 'meters execution of the method' do
     Metriks.expects(:timer).returns(timer)
-    object.foo
+    object.call
   end
 
   it 'still returns the return value of the instrumented method' do
-    object.foo.should == 'foo'
+    object.call.should == 'call'
   end
 end

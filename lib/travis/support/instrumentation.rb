@@ -14,14 +14,16 @@ module Travis
 
     def instrument(name)
       prepend_to(name) do |object, method, *args, &block|
-        event = object.class.name.underscore.split('/').reverse.join('.')
+        event = object.class.name.underscore.split('/').reverse
+        event = [name, *event].join('.')
         ActiveSupport::Notifications.instrument(event, :target => object, :args => args) do
           method.call(*args, &block)
         end
       end
 
       event = self.name.underscore.split('/').reverse.join('.')
-      ActiveSupport::Notifications.subscribe(/#{event}$/, &Instrumentation.method(:consume))
+      event = /^#{name}\.(.*\.)?#{event}$/
+      ActiveSupport::Notifications.subscribe(event, &Instrumentation.method(:consume))
     end
   end
 end
