@@ -13,10 +13,12 @@ module Travis
       end
 
       def call(event, started_at, finished_at, hash, args)
+        event = event.split('.').reverse.join('.')
         Metriks.timer(event).update(finished_at - started_at)
       end
 
       def track(event, args)
+        event = event.split('.').reverse.join('.')
         Metriks.meter(event).mark
       end
     end

@@ -54,7 +54,7 @@ describe Travis::Instrumentation do
 
   describe 'calling the method' do
     it 'meters execution of the method' do
-      Metriks.expects(:timer).returns(timer)
+      Metriks.expects(:timer).with('travis.foo.bar.baz.call').returns(timer)
       object.call
     end
 
@@ -99,18 +99,18 @@ describe Travis::Instrumentation do
       end
 
       it 'tracks the that the method call is received' do
-        Metriks.expects(:meter).with('received.call.baz.bar.foo.travis').returns(meter)
+        Metriks.expects(:meter).with('travis.foo.bar.baz.call.received').returns(meter)
         object.call
       end
 
       it 'tracks the that the method call is completed' do
-        Metriks.expects(:meter).with('completed.call.baz.bar.foo.travis').returns(meter)
+        Metriks.expects(:meter).with('travis.foo.bar.baz.call.completed').returns(meter)
         object.call
       end
 
       it 'tracks the that the method call has failed' do
         object.stubs(:inner).raises(StandardError)
-        Metriks.expects(:meter).with('failed.call.baz.bar.foo.travis').returns(meter)
+        Metriks.expects(:meter).with('travis.foo.bar.baz.call.failed').returns(meter)
         object.call rescue nil
       end
     end
