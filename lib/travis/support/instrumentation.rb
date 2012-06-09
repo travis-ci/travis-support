@@ -1,35 +1,70 @@
 require 'active_support/notifications'
 require 'active_support/core_ext/string/inflections'
+require 'securerandom' # wat
 require 'core_ext/module/prepend_to'
 require 'metriks'
 
 module Travis
-  # Subscribes to the ActiveSupport::Notification API so we can use it for
-  # logging and instruments calls to `notify` (i.e. logs events).
   module Instrumentation
     class << self
-      def consume(event, started_at, finished_at, hash, args)
+      def call(event, started_at, finished_at, hash, args)
         Metriks.timer(event).update(finished_at - started_at)
+      end
+
+      def track(event, args)
+        Metriks.meter(event).mark
       end
     end
 
     def instrument(name, options = {})
       prepend_to(name) do |object, method, *args, &block|
+        instrument_method(name, object, options, method, args, block)
+      end
+
+      # todo how to ask as::notifications if we're subscribed?
+      subscribe_method(name, options) unless @subscribed
+    end
+
+    private
+
+      def subscribe_method(name, options)
+        namespace = self.name.underscore.split('/').reverse.join('.')
+        ActiveSupport::Notifications.subscribe(/^#{name}\.(.+\.)?#{namespace}$/, &Instrumentation.method(:call))
+        ActiveSupport::Notifications.subscribe(/^.+\.#{name}\.(.+\.)?#{namespace}$/, &Instrumentation.method(:track)) if options[:track]
+        @subscribed = true
+      end
+
+      def instrument_method(name, object, options, method, args, block)
         namespace = object.class.name.underscore.split('/').reverse
         scope = options[:scope] ? object.send(options[:scope]) : nil
         event = [name, scope, *namespace].compact.join('.')
+
         ActiveSupport::Notifications.instrument(event, :target => object, :args => args) do
-          method.call(*args, &block)
+          if options[:track]
+            track_method(event, object, args) do
+              method.call(*args, &block)
+            end
+          else
+            method.call(*args, &block)
+          end
         end
       end
 
-      # TODO how to ask AS::Notifications if we're subscribed?
-      unless @subscribed
-        namespace = self.name.underscore.split('/').reverse.join('.')
-        event = /^#{name}\.(.*\.)?#{namespace}$/
-        ActiveSupport::Notifications.subscribe(event, &Instrumentation.method(:consume))
-        @subscribed = true
+      def track_method(name, object, args)
+        begin
+          track_event(name, :received, object, args)
+          result = yield
+          track_event(name, :completed, object, args)
+          result
+        rescue Exception => e
+          track_event(name, :failed, object, args)
+          raise
+        end
       end
-    end
+
+      def track_event(name, event, object, args)
+        event = [event, name].join('.')
+        ActiveSupport::Notifications.publish(event, :target => object, :args => args)
+      end
   end
 end
