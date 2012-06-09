@@ -9,6 +9,7 @@ gem 'gem-patching'
 
 gem 'metriks',         :git => 'git://github.com/mattmatt/metriks', :ref => 'source'
 gem 'hubble',          :git => 'git://github.com/mattmatt/hubble'
+gem 'newrelic_rpm',    '~> 3.3.2'
 
 platform :mri do
   gem 'amq-client',    '>= 0.9.0'

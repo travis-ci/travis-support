@@ -6,6 +6,7 @@ module Travis
   autoload :Exceptions,      'travis/support/exceptions'
   autoload :Instrumentation, 'travis/support/instrumentation'
   autoload :Logging,         'travis/support/logging'
+  autoload :NewRelic,        'travis/support/new_relic'
   autoload :Retryable,       'travis/support/retryable'
 
   class << self
