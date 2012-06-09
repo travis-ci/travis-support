@@ -3,10 +3,15 @@ require 'active_support/core_ext/string/inflections'
 require 'securerandom' # wat
 require 'core_ext/module/prepend_to'
 require 'metriks'
+require 'metriks/reporter/logger'
 
 module Travis
   module Instrumentation
     class << self
+      def setup
+        Metriks::Reporter::Logger.new.start
+      end
+
       def call(event, started_at, finished_at, hash, args)
         Metriks.timer(event).update(finished_at - started_at)
       end
