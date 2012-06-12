@@ -9,10 +9,10 @@ describe Travis::Instrumentation do
         'Travis::Foo::Bar'
       end
 
-      def call(*args)
+      def tracked(*args)
         inner
       end
-      instrument :call, :scope => :scope, :track => true
+      instrument :tracked, :scope => :scope, :track => true
 
       def inner
         'result'
@@ -32,8 +32,8 @@ describe Travis::Instrumentation do
   end
 
   it 'instruments the method' do
-    ActiveSupport::Notifications.expects(:instrument).with('call.baz.bar.foo.travis', :target => object, :args => ['foo'])
-    object.call('foo')
+    ActiveSupport::Notifications.expects(:instrument).with('travis.foo.bar.baz.tracked:call', :target => object, :args => ['foo'])
+    object.tracked('foo')
   end
 
   describe 'subscriptions' do
@@ -42,24 +42,19 @@ describe Travis::Instrumentation do
     end
 
     it 'subscribes to AS::Notification events on this class and namespaced classes' do
-      ActiveSupport::Notifications.expects(:subscribe).with(/^call\.(.+\.)?bar.foo.travis$/)
-      object.call
-    end
-
-    it 'subscribes to AS::Notification events for method tracking' do
-      ActiveSupport::Notifications.expects(:subscribe).with(/^.+\.call\.(.+\.)?bar.foo.travis$/)
-      object.call
+      ActiveSupport::Notifications.expects(:subscribe)
+      object.tracked
     end
   end
 
   describe 'calling the method' do
     it 'meters execution of the method' do
-      Metriks.expects(:timer).with('travis.foo.bar.baz.call').returns(timer)
-      object.call
+      Metriks.expects(:timer).with('travis.foo.bar.baz.tracked:call').returns(timer)
+      object.tracked
     end
 
     it 'still returns the return value of the instrumented method' do
-      object.call.should == 'result'
+      object.tracked.should == 'result'
     end
   end
 
@@ -72,24 +67,24 @@ describe Travis::Instrumentation do
       end
 
       it 'about the method receive event' do
-        ActiveSupport::Notifications.expects(:publish).with('received.call.baz.bar.foo.travis', :target => object, :args => [])
-        object.call
+        ActiveSupport::Notifications.expects(:publish).with('travis.foo.bar.baz.tracked:received', :target => object, :args => [])
+        object.tracked
       end
 
       it 'about the method complete event' do
-        ActiveSupport::Notifications.expects(:publish).with('completed.call.baz.bar.foo.travis', :target => object, :args => [])
-        object.call
+        ActiveSupport::Notifications.expects(:publish).with('travis.foo.bar.baz.tracked:completed', :target => object, :args => [])
+        object.tracked
       end
 
       it 'about the method failed event' do
         object.stubs(:inner).raises(StandardError)
-        ActiveSupport::Notifications.expects(:publish).with('failed.call.baz.bar.foo.travis', :target => object, :args => [])
-        object.call rescue nil
+        ActiveSupport::Notifications.expects(:publish).with('travis.foo.bar.baz.tracked:failed', :target => object, :args => [])
+        object.tracked rescue nil
       end
 
       it 'reraises the exception from the failed method call' do
         object.stubs(:inner).raises(StandardError)
-        lambda { object.call }.should raise_error(StandardError)
+        lambda { object.tracked }.should raise_error(StandardError)
       end
     end
 
@@ -99,19 +94,19 @@ describe Travis::Instrumentation do
       end
 
       it 'tracks the that the method call is received' do
-        Metriks.expects(:meter).with('travis.foo.bar.baz.call.received').returns(meter)
-        object.call
+        Metriks.expects(:meter).with('travis.foo.bar.baz.tracked:received').returns(meter)
+        object.tracked
       end
 
       it 'tracks the that the method call is completed' do
-        Metriks.expects(:meter).with('travis.foo.bar.baz.call.completed').returns(meter)
-        object.call
+        Metriks.expects(:meter).with('travis.foo.bar.baz.tracked:completed').returns(meter)
+        object.tracked
       end
 
       it 'tracks the that the method call has failed' do
         object.stubs(:inner).raises(StandardError)
-        Metriks.expects(:meter).with('travis.foo.bar.baz.call.failed').returns(meter)
-        object.call rescue nil
+        Metriks.expects(:meter).with('travis.foo.bar.baz.tracked:failed').returns(meter)
+        object.tracked rescue nil
       end
     end
   end

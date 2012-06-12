@@ -5,6 +5,25 @@ require 'core_ext/module/prepend_to'
 require 'metriks'
 require 'metriks/reporter/logger'
 
+ActiveSupport::Notifications::Instrumenter.class_eval do
+  def instrument(name, payload={})
+    started = Time.now
+
+    begin
+      if name[0..5] == 'travis'
+        payload[:result] = yield # add the result to the payload
+      else
+        yield
+      end
+    rescue Exception => e
+      payload[:exception] = [e.class.name, e.message]
+      raise e
+    ensure
+      @notifier.publish(name, started, Time.now, @id, payload)
+    end
+  end
+end
+
 module Travis
   module Instrumentation
     class << self
@@ -12,14 +31,15 @@ module Travis
         Metriks::Reporter::Logger.new.start
       end
 
-      def call(event, started_at, finished_at, hash, args)
-        event = event.split('.').reverse.join('.')
-        Metriks.timer(event).update(finished_at - started_at)
-      end
+      def track(event, *args)
+        payload = args.pop
+        started_at, finished_at, id = *args
 
-      def track(event, args)
-        event = event.split('.').reverse.join('.')
-        Metriks.meter(event).mark
+        if started_at
+          Metriks.timer(event).update(finished_at - started_at)
+        else
+          Metriks.meter(event).mark
+        end
       end
     end
 
@@ -27,40 +47,35 @@ module Travis
       prepend_to(name) do |object, method, *args, &block|
         instrument_method(name, object, options, method, args, block)
       end
-
-      # todo how to ask as::notifications if we're subscribed?
-      subscribe_method(name, options) unless @subscribed
+      subscribe_method(name, options)
     end
 
     private
 
+      def subscribed?(event)
+        ActiveSupport::Notifications.notifier.listening?(event)
+      end
+
       def subscribe_method(name, options)
-        namespace = self.name.underscore.split('/').reverse.join('.')
-        ActiveSupport::Notifications.subscribe(/^#{name}\.(.+\.)?#{namespace}$/, &Instrumentation.method(:call))
-        ActiveSupport::Notifications.subscribe(/^.+\.#{name}\.(.+\.)?#{namespace}$/, &Instrumentation.method(:track)) if options[:track]
-        @subscribed = true
+        namespace = self.name.underscore.gsub('/', '.')
+        event = /^#{namespace}\.(.+\.)?#{name}(:(received|call|completed|failed))?$/
+        ActiveSupport::Notifications.subscribe(event, &Instrumentation.method(:track)) unless subscribed?(event)
       end
 
       def instrument_method(name, object, options, method, args, block)
-        namespace = object.class.name.underscore.split('/').reverse
         scope = options[:scope] ? object.send(options[:scope]) : nil
-        event = [name, scope, *namespace].compact.join('.')
+        namespace = object.class.name.underscore.split('/') << scope << name
+        event = namespace.compact.join('.')
 
-        ActiveSupport::Notifications.instrument(event, :target => object, :args => args) do
-          if options[:track]
-            track_method(event, object, args) do
-              method.call(*args, &block)
-            end
-          else
-            method.call(*args, &block)
-          end
+        track_method(event, object, args) do
+          method.call(*args, &block)
         end
       end
 
-      def track_method(name, object, args)
+      def track_method(name, object, args, &block)
         begin
           track_event(name, :received, object, args)
-          result = yield
+          result = ActiveSupport::Notifications.instrument([name, :call].join(':'), :target => object, :args => args, &block)
           track_event(name, :completed, object, args)
           result
         rescue Exception => e
@@ -70,8 +85,7 @@ module Travis
       end
 
       def track_event(name, event, object, args)
-        event = [event, name].join('.')
-        ActiveSupport::Notifications.publish(event, :target => object, :args => args)
+        ActiveSupport::Notifications.publish([name, event].join(':'), :target => object, :args => args)
       end
   end
 end
