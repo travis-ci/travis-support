@@ -1,4 +1,5 @@
 require 'securerandom'
+require 'core_ext/securerandom'
 
 module Travis
   autoload :Amqp,            'travis/support/amqp'
