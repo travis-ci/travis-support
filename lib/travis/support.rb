@@ -1,3 +1,5 @@
+require 'securerandom'
+
 module Travis
   autoload :Amqp,            'travis/support/amqp'
   autoload :Assertions,      'travis/support/assertions'
@@ -20,6 +22,14 @@ module Travis
 
     def logger=(logger)
       @logger = Logging.configure(logger)
+    end
+
+    def uuid= (uuid)
+      Thread.current[:uuid] = uuid
+    end
+
+    def uuid
+      Thread.current[:uuid] ||= SecureRandom.uuid
     end
   end
 end
