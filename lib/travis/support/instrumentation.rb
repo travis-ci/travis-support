@@ -44,10 +44,10 @@ module Travis
     end
 
     def instrument(name, options = {})
-      prepend_to(name) do |object, method, *args, &block|
-        instrument_method(name, object, options, method, args, block)
-      end
-      subscribe_method(name, options)
+      # prepend_to(name) do |object, method, *args, &block|
+      #   instrument_method(name, object, options, method, args, block)
+      # end
+      # subscribe_method(name, options)
     end
 
     private
