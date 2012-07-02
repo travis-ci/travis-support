@@ -7,8 +7,8 @@ gem 'multi_json'
 gem 'json'
 gem 'gem-patching'
 
-gem 'metriks',         :git => 'git://github.com/mattmatt/metriks', :ref => 'source'
-gem 'hubble',          :git => 'git://github.com/mattmatt/hubble'
+gem 'metriks',         :git => 'https://github.com/roidrage/metriks.git', :ref => 'source'
+gem 'hubble',          :git => 'https://github.com/roidrage/hubble.git'
 gem 'newrelic_rpm',    '~> 3.3.2'
 
 platform :mri do
