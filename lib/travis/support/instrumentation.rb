@@ -45,7 +45,7 @@ module Travis
 
     def instrument(name, options = {})
       instrument_method(name, options)
-      #subscribe_method(name, options)
+      subscribe_method(name, options)
     end
 
     private
