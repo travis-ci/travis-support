@@ -62,13 +62,8 @@ module Travis
 
       def instrument_method(name, options)
         wrapped = "#{name}_without_instrumentation"
-
-        event    = self.name.underscore.gsub('/', '.')
-        event << '.#{' << options[:scope].to_s << '}' if options[:scope]
-        event << '.' << name.to_s
-
         rename_method(name, wrapped)
-        class_eval instrumentation_template(name, event, wrapped)
+        class_eval instrumentation_template(name, options[:scope], wrapped)
       end
 
       def rename_method(old_name, new_name)
@@ -77,16 +72,17 @@ module Travis
         private(new_name)
       end
 
-      def instrumentation_template(name, event, wrapped)
-        as = 'ActiveSupport::Notifications.%s("%s:%s", :target => self, :args => args)'
+      def instrumentation_template(name, scope, wrapped)
+        as = 'ActiveSupport::Notifications.%s("#{event}:%s", :target => self, :args => args)'
         <<-RUBY
           def #{name}(*args, &block)
-            #{as % [ :publish, event, 'received']}
-            result = #{as % [ :instrument, event, 'call']} { #{wrapped}(*args, &block) }
-            #{as % [ :publish, event, 'completed']}
+            event = self.class.name.underscore.gsub("/", ".") #{"<< '.' << #{scope}" if scope} << ".#{name}"
+            #{as % [ :publish, 'received']}
+            result = #{as % [ :instrument, 'call']} { #{wrapped}(*args, &block) }
+            #{as % [ :publish, 'completed']}
             result
           rescue Exception => e
-            #{as % [ :publish, event, 'failed']}
+            #{as % [ :publish, 'failed']}
             raise
           end
         RUBY
