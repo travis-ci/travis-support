@@ -44,10 +44,8 @@ module Travis
     end
 
     def instrument(name, options = {})
-      # prepend_to(name) do |object, method, *args, &block|
-      #   instrument_method(name, object, options, method, args, block)
-      # end
-      # subscribe_method(name, options)
+      instrument_method(name, options)
+      subscribe_method(name, options)
     end
 
     private
@@ -62,30 +60,32 @@ module Travis
         ActiveSupport::Notifications.subscribe(event, &Instrumentation.method(:track)) unless subscribed?(event)
       end
 
-      def instrument_method(name, object, options, method, args, block)
-        scope = options[:scope] ? object.send(options[:scope]) : nil
-        namespace = object.class.name.underscore.split('/') << scope << name
-        event = namespace.compact.join('.')
-
-        track_method(event, object, args) do
-          method.call(*args, &block)
-        end
+      def instrument_method(name, options)
+        wrapped = "#{name}_without_instrumentation"
+        rename_method(name, wrapped)
+        class_eval instrumentation_template(name, options[:scope], wrapped)
       end
 
-      def track_method(name, object, args, &block)
-        begin
-          track_event(name, :received, object, args)
-          result = ActiveSupport::Notifications.instrument([name, :call].join(':'), :target => object, :args => args, &block)
-          track_event(name, :completed, object, args)
-          result
-        rescue Exception => e
-          track_event(name, :failed, object, args)
-          raise
-        end
+      def rename_method(old_name, new_name)
+        alias_method(new_name, old_name)
+        remove_method(old_name)
+        private(new_name)
       end
 
-      def track_event(name, event, object, args)
-        ActiveSupport::Notifications.publish([name, event].join(':'), :target => object, :args => args)
+      def instrumentation_template(name, scope, wrapped)
+        as = 'ActiveSupport::Notifications.%s("#{event}:%s", :target => self, :args => args)'
+        <<-RUBY
+          def #{name}(*args, &block)
+            event = self.class.name.underscore.gsub("/", ".") #{"<< '.' << #{scope}" if scope} << ".#{name}"
+            #{as % [ :publish, 'received']}
+            result = #{as % [ :instrument, 'call']} { #{wrapped}(*args, &block) }
+            #{as % [ :publish, 'completed']}
+            result
+          rescue Exception => e
+            #{as % [ :publish, 'failed']}
+            raise
+          end
+        RUBY
       end
   end
 end
