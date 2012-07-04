@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'active_support/core_ext/hash/except'
 
 describe Travis::Instrumentation do
   let(:klass) do
@@ -26,14 +27,50 @@ describe Travis::Instrumentation do
 
   let(:object) { klass.new }
   let(:timer)  { stub('timer', :update => true) }
+  let(:events) { [] }
+
+  before :each do
+    @subscriber = ActiveSupport::Notifications.subscribe /^travis\.foo\.bar\.baz\.tracked:.*$/ do |key, args|
+      events << [key, args]
+    end
+  end
+
+  after :each do
+    ActiveSupport::Notifications.unsubscribe(@subscriber)
+  end
 
   before :each do
     Metriks.stubs(:timer).returns(timer)
   end
 
-  it 'instruments the method' do
-    ActiveSupport::Notifications.expects(:instrument).with('travis.foo.bar.baz.tracked:call', :target => object, :args => ['foo'])
-    object.tracked('foo')
+  describe 'instruments the method' do
+    it 'sends received events' do
+      object.tracked('foo')
+      key, args = events.first
+      key.should == 'travis.foo.bar.baz.tracked:received'
+      args.except(:started_at).should == { :target => object, :args => ['foo'] }
+      args[:started_at].should be_a(Float)
+    end
+
+    it 'sends completed events' do
+      object.tracked('foo')
+      key, args = events.last
+      key.should == 'travis.foo.bar.baz.tracked:completed'
+      args.except(:started_at, :finished_at).should == { :target => object, :args => ['foo'], :result => "result" }
+      args[:started_at].should be_a(Float)
+      args[:finished_at].should be_a(Float)
+    end
+
+    it 'sends completed events' do
+      object.stubs(:inner).raises(StandardError, 'I FAIL!')
+      object.tracked('foo') rescue nil
+      key, args = events.last
+      key.should == 'travis.foo.bar.baz.tracked:failed'
+      args[:target].should == object
+      args[:args].should == ['foo']
+      args[:exception].should == ["StandardError", "I FAIL!"]
+    end
+
   end
 
   describe 'subscriptions' do
@@ -49,65 +86,43 @@ describe Travis::Instrumentation do
 
   describe 'calling the method' do
     it 'meters execution of the method' do
-      Metriks.expects(:timer).with('travis.foo.bar.baz.tracked:call').returns(timer)
+      Metriks.expects(:timer).with('travis.foo.bar.baz.tracked:completed').returns(timer)
       object.tracked
     end
 
     it 'still returns the return value of the instrumented method' do
       object.tracked.should == 'result'
     end
+
+    it 'reraises the exception from the failed method call' do
+      object.stubs(:inner).raises(StandardError)
+      lambda { object.tracked }.should raise_error(StandardError)
+    end
   end
 
-  describe 'tracking' do
+  describe 'meters events' do
     let(:meter) { stub('meter', :mark => true) }
+    let(:timer) { stub('timer', :update => true) }
 
-    describe 'publishes ActiveSupport::Notification events' do
-      before :each do
-        ActiveSupport::Notifications.stubs(:publish)
-      end
-
-      it 'about the method receive event' do
-        ActiveSupport::Notifications.expects(:publish).with('travis.foo.bar.baz.tracked:received', :target => object, :args => [])
-        object.tracked
-      end
-
-      it 'about the method complete event' do
-        ActiveSupport::Notifications.expects(:publish).with('travis.foo.bar.baz.tracked:completed', :target => object, :args => [])
-        object.tracked
-      end
-
-      it 'about the method failed event' do
-        object.stubs(:inner).raises(StandardError)
-        ActiveSupport::Notifications.expects(:publish).with('travis.foo.bar.baz.tracked:failed', :target => object, :args => [])
-        object.tracked rescue nil
-      end
-
-      it 'reraises the exception from the failed method call' do
-        object.stubs(:inner).raises(StandardError)
-        lambda { object.tracked }.should raise_error(StandardError)
-      end
+    before(:each) do
+      Metriks.stubs(:meter).returns(meter)
+      Metriks.stubs(:timer).returns(timer)
     end
 
-    describe 'meters events' do
-      before(:each) do
-        Metriks.stubs(:meter).returns(meter)
-      end
+    it 'tracks the that the method call is received' do
+      Metriks.expects(:meter).with('travis.foo.bar.baz.tracked:received').returns(meter)
+      object.tracked
+    end
 
-      it 'tracks the that the method call is received' do
-        Metriks.expects(:meter).with('travis.foo.bar.baz.tracked:received').returns(meter)
-        object.tracked
-      end
+    it 'tracks the that the method call is completed' do
+      Metriks.expects(:timer).with('travis.foo.bar.baz.tracked:completed').returns(timer)
+      object.tracked
+    end
 
-      it 'tracks the that the method call is completed' do
-        Metriks.expects(:meter).with('travis.foo.bar.baz.tracked:completed').returns(meter)
-        object.tracked
-      end
-
-      it 'tracks the that the method call has failed' do
-        object.stubs(:inner).raises(StandardError)
-        Metriks.expects(:meter).with('travis.foo.bar.baz.tracked:failed').returns(meter)
-        object.tracked rescue nil
-      end
+    it 'tracks the that the method call has failed' do
+      object.stubs(:inner).raises(StandardError)
+      Metriks.expects(:meter).with('travis.foo.bar.baz.tracked:failed').returns(meter)
+      object.tracked rescue nil
     end
   end
 end
