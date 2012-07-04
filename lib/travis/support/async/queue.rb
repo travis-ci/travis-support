@@ -1,30 +1,23 @@
+require 'thread'
+
 module Travis
   module Async
     class Queue
       attr_reader :name
       attr_reader :items
 
-      @@lock = Mutex.new
-
       def initialize(name)
         @name  = name
-        @items = []
+        @items = ::Queue.new
         Thread.new { loop { work } }
       end
 
       def work
-        block = with_lock { @items.pop }
-        block.call if block
+        @items.pop.call
       end
 
       def <<(item)
-        with_lock { @items << item }
-      end
-
-      private
-
-      def with_lock
-        @@lock.synchronize { yield }
+        @items.push(item)
       end
     end
   end
