@@ -71,6 +71,10 @@ describe Travis::Instrumentation do
       args[:exception].should == ["StandardError", "I FAIL!"]
     end
 
+    it 'sends out just two notifications' do
+      object.tracked('foo')
+      events.size.should == 2
+    end
   end
 
   describe 'subscriptions' do
