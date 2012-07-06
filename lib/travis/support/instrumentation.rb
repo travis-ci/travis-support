@@ -5,25 +5,6 @@ require 'core_ext/module/prepend_to'
 require 'metriks'
 require 'metriks/reporter/logger'
 
-ActiveSupport::Notifications::Instrumenter.class_eval do
-  def instrument(name, payload={})
-    started = Time.now
-
-    begin
-      if name[0..5] == 'travis'
-        payload[:result] = yield # add the result to the payload
-      else
-        yield
-      end
-    rescue Exception => e
-      payload[:exception] = [e.class.name, e.message]
-      raise e
-    ensure
-      @notifier.publish(name, started, Time.now, @id, payload)
-    end
-  end
-end
-
 module Travis
   module Instrumentation
     class << self
@@ -31,11 +12,10 @@ module Travis
         Metriks::Reporter::Logger.new.start
       end
 
-      def track(event, *args)
-        payload = args.pop
-        started_at, finished_at, id = *args
+      def track(event, args)
+        started_at, finished_at = args[:started_at], args[:finished_at]
 
-        if started_at
+        if finished_at
           Metriks.timer(event).update(finished_at - started_at)
         else
           Metriks.meter(event).mark
@@ -56,7 +36,7 @@ module Travis
 
       def subscribe_method(name, options)
         namespace = self.name.underscore.gsub('/', '.')
-        event = /^#{namespace}\.(.+\.)?#{name}(:(received|call|completed|failed))?$/
+        event = /^#{namespace}\.(.+\.)?#{name}(:(received|completed|failed))?$/
         ActiveSupport::Notifications.subscribe(event, &Instrumentation.method(:track)) unless subscribed?(event)
       end
 
@@ -73,16 +53,17 @@ module Travis
       end
 
       def instrumentation_template(name, scope, wrapped)
-        as = 'ActiveSupport::Notifications.%s("#{event}:%s", :target => self, :args => args)'
+        as = 'ActiveSupport::Notifications.publish "#{event}:%s", :target => self, :args => args, :started_at => started_at'
         <<-RUBY
           def #{name}(*args, &block)
+            started_at = Time.now.to_f
             event = self.class.name.underscore.gsub("/", ".") #{"<< '.' << #{scope}" if scope} << ".#{name}"
-            #{as % [ :publish, 'received']}
-            result = #{as % [ :instrument, 'call']} { #{wrapped}(*args, &block) }
-            #{as % [ :publish, 'completed']}
+            #{as % 'received'}
+            result = #{wrapped}(*args, &block)
+            #{as % 'completed'}, :finished_at => Time.now.to_f, :result => result
             result
           rescue Exception => e
-            #{as % [ :publish, 'failed']}
+            #{as % 'failed'}, :exception => [e.class.name, e.message]
             raise
           end
         RUBY
