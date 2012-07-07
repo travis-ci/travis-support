@@ -7,6 +7,7 @@ module Travis
   autoload :Async,           'travis/support/async'
   autoload :Database,        'travis/support/database'
   autoload :Exceptions,      'travis/support/exceptions'
+  autoload :Helpers,         'travis/support/helpers'
   autoload :Instrumentation, 'travis/support/instrumentation'
   autoload :Logging,         'travis/support/logging'
   autoload :NewRelic,        'travis/support/new_relic'
