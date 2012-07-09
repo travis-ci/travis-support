@@ -113,17 +113,12 @@ describe Travis::Instrumentation do
       Metriks.stubs(:timer).returns(timer)
     end
 
-    it 'tracks the that the method call is received' do
-      Metriks.expects(:meter).with('travis.foo.bar.baz.tracked:received').returns(meter)
-      object.tracked
-    end
-
-    it 'tracks the that the method call is completed' do
+    it 'meters that the method call is completed' do
       Metriks.expects(:timer).with('travis.foo.bar.baz.tracked:completed').returns(timer)
       object.tracked
     end
 
-    it 'tracks the that the method call has failed' do
+    it 'meters that the method call has failed' do
       object.stubs(:inner).raises(StandardError)
       Metriks.expects(:meter).with('travis.foo.bar.baz.tracked:failed').returns(meter)
       object.tracked rescue nil

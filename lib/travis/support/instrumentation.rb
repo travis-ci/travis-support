@@ -12,7 +12,7 @@ module Travis
         Metriks::Reporter::Logger.new.start
       end
 
-      def track(event, args)
+      def meter(event, args)
         started_at, finished_at = args[:started_at], args[:finished_at]
 
         if finished_at
@@ -36,8 +36,8 @@ module Travis
 
       def subscribe_method(name, options)
         namespace = self.name.underscore.gsub('/', '.')
-        event = /^#{namespace}\.(.+\.)?#{name}(:(received|completed|failed))?$/
-        ActiveSupport::Notifications.subscribe(event, &Instrumentation.method(:track)) unless subscribed?(event)
+        event = /^#{namespace}\.(.+\.)?#{name}(:(completed|failed))?$/
+        ActiveSupport::Notifications.subscribe(event, &Instrumentation.method(:meter)) unless subscribed?(event)
       end
 
       def instrument_method(name, options)
