@@ -1,7 +1,6 @@
 require 'active_support/notifications'
 require 'active_support/core_ext/string/inflections'
 require 'securerandom' # wat
-require 'core_ext/module/prepend_to'
 require 'metriks'
 require 'metriks/reporter/logger'
 
