@@ -7,12 +7,15 @@ require 'metriks/reporter/logger'
 
 module Travis
   module Instrumentation
+    METRICS_VERSION = 'v1'
+
     class << self
       def setup
         Metriks::Reporter::Logger.new.start
       end
 
       def meter(event, args)
+        event = "#{METRICS_VERSION}.#{event}"
         started_at, finished_at = args[:started_at], args[:finished_at]
 
         if finished_at
