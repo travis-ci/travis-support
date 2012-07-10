@@ -30,7 +30,7 @@ describe Travis::Instrumentation do
   let(:events) { [] }
 
   before :each do
-    @subscriber = ActiveSupport::Notifications.subscribe /^travis\.foo\.bar\.baz\.tracked:.*$/ do |key, args|
+    @subscriber = ActiveSupport::Notifications.subscribe /travis.foo.bar.baz/ do |key, args|
       events << [key, args]
     end
   end
@@ -48,7 +48,7 @@ describe Travis::Instrumentation do
       object.tracked('foo')
       key, args = events.first
       key.should == 'travis.foo.bar.baz.tracked:received'
-      args.except(:started_at).should == { :target => object, :args => ['foo'] }
+      args.except(:started_at, :level).should == { :target => object, :args => ['foo'] }
       args[:started_at].should be_a(Float)
     end
 
@@ -56,7 +56,7 @@ describe Travis::Instrumentation do
       object.tracked('foo')
       key, args = events.last
       key.should == 'travis.foo.bar.baz.tracked:completed'
-      args.except(:started_at, :finished_at).should == { :target => object, :args => ['foo'], :result => "result" }
+      args.except(:started_at, :finished_at, :level).should == { :target => object, :args => ['foo'], :result => "result" }
       args[:started_at].should be_a(Float)
       args[:finished_at].should be_a(Float)
     end
@@ -122,6 +122,34 @@ describe Travis::Instrumentation do
       object.stubs(:inner).raises(StandardError)
       Metriks.expects(:meter).with('v1.travis.foo.bar.baz.tracked:failed').returns(meter)
       object.tracked rescue nil
+    end
+  end
+
+  describe 'levels' do
+    let(:event) { events.last }
+    let(:args) { event.last }
+    let(:level) { args[:level] }
+
+    it 'defaults the level to :info' do
+      object.tracked('foo')
+      level.should == :info
+    end
+
+    it 'may be set as option' do
+      klass.send(:define_method, :other) { }
+      klass.instrument :other, :level => :error, :scope => :scope, :track => true
+
+      object.other
+      level.should == :error
+    end
+
+    it 'does not record metrics for debug level' do
+      Metriks.expects(:meter).never
+      Metriks.expects(:timer).never
+
+      klass.send(:define_method, :other) { }
+      klass.instrument :other, :level => :debug, :scope => :scope, :track => true
+      object.other
     end
   end
 end
