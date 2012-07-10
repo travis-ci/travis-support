@@ -14,6 +14,7 @@ module Travis
       end
 
       def meter(event, args)
+        return if args[:level] == :debug
         event = "#{METRICS_VERSION}.#{event}"
         started_at, finished_at = args[:started_at], args[:finished_at]
 
@@ -45,7 +46,7 @@ module Travis
       def instrument_method(name, options)
         wrapped = "#{name}_without_instrumentation"
         rename_method(name, wrapped)
-        class_eval instrumentation_template(name, options[:scope], wrapped)
+        class_eval instrumentation_template(name, options[:scope], wrapped, options[:level] || :info)
       end
 
       def rename_method(old_name, new_name)
@@ -54,8 +55,8 @@ module Travis
         private(new_name)
       end
 
-      def instrumentation_template(name, scope, wrapped)
-        as = 'ActiveSupport::Notifications.publish "#{event}:%s", :target => self, :args => args, :started_at => started_at'
+      def instrumentation_template(name, scope, wrapped, level)
+        as = 'ActiveSupport::Notifications.publish "#{event}:%s", :target => self, :args => args, :started_at => started_at, :level => ' + level.inspect
         <<-RUBY
           def #{name}(*args, &block)
             started_at = Time.now.to_f
