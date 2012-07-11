@@ -7,7 +7,7 @@ module Travis
 
     class << self
       def config
-        @config
+        @config ||= {}
       end
 
       def config=(config)
