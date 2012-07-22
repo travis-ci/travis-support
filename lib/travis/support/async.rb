@@ -30,7 +30,11 @@ module Travis
     def async(name, options = {})
       if Async.enabled?
         prepend_to name do |object, method, *args, &block|
-          Async.run(options[:queue]) { method.call(*args, &block) }
+          uuid = Travis.uuid
+          Async.run(options[:queue]) do
+            Travis.uuid = uuid
+            method.call(*args, &block)
+          end
         end
       end
     end
