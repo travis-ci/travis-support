@@ -41,7 +41,7 @@ module Travis
       end
 
       def handle(error)
-        Travis.logger.error("Error: #{error.message}\n#{error.backtrace ? error.backtrace.join("\n") : ''}")
+        Travis.logger.error(message_for(error))
         Hubble.report(error, metadata_for(error)) if hubble?
       rescue Exception => e
         puts '---- FAILSAFE ----'
