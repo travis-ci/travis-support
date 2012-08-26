@@ -9,7 +9,6 @@ module Travis
     class Reporter
       class << self
         def start
-          Hubble.setup if ENV['HUBBLE_ENV']
           Reporter.new.run
         end
 
@@ -24,7 +23,12 @@ module Travis
       attr_accessor :thread
 
       def run
+        Hubble.setup if hubble?
         @thread = Thread.new &method(:error_loop)
+      end
+
+      def hubble?
+        !!ENV['HUBBLE_ENV']
       end
 
       def error_loop
@@ -37,11 +41,13 @@ module Travis
       end
 
       def handle(error)
-        Hubble.report(error, metadata_for(error))
         Travis.logger.error("Error: #{error.message}")
-      rescue => e
+        Hubble.report(error, metadata_for(error)) if hubble?
+      rescue Exception => e
+        puts '---- FAILSAFE ----'
         puts "Error while handling exception: #{e.message}"
         puts e.backtrace
+        puts '------------------'
       end
 
       def metadata_for(error)

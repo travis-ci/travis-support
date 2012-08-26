@@ -11,18 +11,20 @@ describe Travis::Exceptions::Handling do
       def outer
         inner
       end
+      rescues :outer
 
       def inner # so there's something we can stub for raising
         @called = true
       end
+
+      def arity_3(foo, bar, baz)
+        [foo, bar, baz]
+      end
+      rescues :arity_3
     end
   end
 
   let(:object) { klass.new }
-
-  before :each do
-    klass.rescues :outer
-  end
 
   it 'calls the original implementation' do
     object.outer
@@ -39,5 +41,9 @@ describe Travis::Exceptions::Handling do
     object.stubs(:inner).raises(exception)
     Travis::Exceptions.expects(:handle).with(exception)
     object.outer
+  end
+
+  it 'works with methods that have an arity of 3' do
+    object.arity_3(1, 2, 3).should == [1, 2, 3]
   end
 end

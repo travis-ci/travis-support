@@ -5,6 +5,7 @@ describe Travis::Exceptions::Reporter do
 
   before :each do
     Travis::Exceptions::Reporter.queue = Queue.new
+    reporter.stubs(:hubble?).returns(true)
     Hubble.config['backend_name'] = 'memory'
     Hubble.raise_errors = false
   end
