@@ -52,7 +52,7 @@ module Travis
 
       def message_for(error)
         lines = ["Error: #{error.message}"]
-        lines += error.backtrace ? error.backtrace : []
+        lines += error.backtrace ? error.backtrace : [] if Travis.logger.level == Logger::DEBUG
         lines.join("\n")
       end
 
