@@ -57,11 +57,8 @@ module Travis
       end
 
       def metadata_for(error)
-        metadata = { 'env' => Travis.env }
-        # TODO simply ask the exception for metadata and merge it
-        metadata['payload']  = error.payload if error.respond_to?(:payload)
-        metadata['event']    = error.event if error.respond_to?(:event)
-        metadata['codename'] = ENV['CODENAME'] if ENV.key?('CODENAME')
+        metadata = { 'env' => Travis.env, 'codename' => ENV['CODENAME'] }
+        metadata.merge!(error.metadata) if error.respond_to?(:metadata)
         metadata
       end
     end

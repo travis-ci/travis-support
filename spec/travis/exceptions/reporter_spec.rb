@@ -39,20 +39,15 @@ describe Travis::Exceptions::Reporter do
 
   it "should add custom metadata to hubble" do
     exception = Class.new(StandardError) do
-      def event
-        'configure'
-      end
-
-      def payload
-        { 'type' => 'pull_request' }
+      def metadata
+        { 'metadata' => 'metadata' }
       end
     end.new
 
     reporter.handle(exception)
 
     reported = Hubble.backend.reports.first
-    reported['payload'].should == {'type' => 'pull_request'}.inspect
-    reported['event'].should == 'configure'
+    reported['metadata'].should == 'metadata'
   end
 
   it "should add the travis environment to hubble" do
