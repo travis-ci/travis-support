@@ -29,6 +29,20 @@ module Travis
           @connection = nil
         end
       end
+
+      def channel
+        @channel ||= connection.create_channel.tap do |channel|
+          channel.prefetch = 1
+        end
+      end
+
+      def exchange(name, options = {})
+        channel.exchange(name, options)
+      end
+
+      def queue(name, options = {})
+        channel.queue(name, options)
+      end
     end
   end
 end
