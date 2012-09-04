@@ -21,11 +21,7 @@ module Travis
       protected
 
         def exchange
-          @exchange ||= channel.exchange(name, :durable => true, :auto_delete => false, :type => type)
-        end
-
-        def channel
-          @channel ||= Amqp.connection.create_channel
+          @exchange ||= Amqp.exchange(name, :durable => true, :auto_delete => false, :type => type)
         end
 
         def deep_merge(hash, other)
