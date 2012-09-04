@@ -33,19 +33,11 @@ module Travis
       protected
 
         def queue
-          @queue ||= begin
-            queue = channel.queue(name, options.queue)
+          @queue ||= Amqp.queue(name, options.queue).tap do |queue|
             if options.exchange.name
               routing_key = options.exchange.routing_key || name
               queue.bind(options.exchange.name, :routing_key => routing_key)
             end
-            queue
-          end
-        end
-
-        def channel
-          @channel ||= Amqp.connection.create_channel.tap do |channel|
-            channel.prefetch = options.channel.prefetch
           end
         end
 
