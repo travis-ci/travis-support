@@ -6,10 +6,10 @@ module Travis
   class Memory
     import java.lang.management.ManagementFactory
 
-    class << self
-      def report_periodically
-        new.report_periodically
-      end
+    attr_reader :app
+
+    def initialize(app)
+      @app = app
     end
 
     def report_periodically
@@ -31,7 +31,7 @@ module Travis
 
     def meter
       [:used, :committed].each do |key|
-        Metriks.meter("v1.travis.logs.memory.heap.#{key}").mark(heap.send(key))
+        Metriks.meter("v1.travis.#{app}.memory.heap.#{key}").mark(heap.send(key))
       end
     end
 
