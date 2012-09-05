@@ -1,11 +1,11 @@
 require 'java'
+require 'metriks'
 require 'core_ext/kernel/run_periodically'
-
-import java.lang.management.ManagementFactory
-
 
 module Travis
   class Memory
+    import java.lang.management.ManagementFactory
+
     class << self
       def report_periodically
         new.report_periodically
