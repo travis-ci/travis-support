@@ -10,6 +10,7 @@ module Travis
   autoload :Helpers,         'travis/support/helpers'
   autoload :Instrumentation, 'travis/support/instrumentation'
   autoload :Logging,         'travis/support/logging'
+  autoload :Memory,          'travis/support/memory'
   autoload :NewRelic,        'travis/support/new_relic'
   autoload :Retryable,       'travis/support/retryable'
 
