@@ -23,7 +23,10 @@ module Travis
       attr_accessor :thread
 
       def run
-        Hubble.setup if hubble?
+        if hubble?
+          Hubble.setup
+          Hubble.config['ssl'] = Travis.config.ssl
+        end
         @thread = Thread.new &method(:error_loop)
       end
 
