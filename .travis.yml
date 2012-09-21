@@ -8,6 +8,8 @@ jdk:
   - openjdk6
   - openjdk7
   - oraclejdk7
+services:
+  - rabbitmq
 matrix:
   exclude:
     - rvm: 1.9.2
