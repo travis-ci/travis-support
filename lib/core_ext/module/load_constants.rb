@@ -1,9 +1,10 @@
 class Module
   class Preloader
-    attr_reader :skip_patterns, :skip_names
+    attr_reader :skip_patterns, :skip_names, :debug
 
     def initialize(options)
       skip = options[:skip] || []
+      @debug = options[:debug]
       @skip_patterns, @skip_names = skip.partition do |skip|
         skip.is_a?(Regexp)
       end
@@ -14,6 +15,7 @@ class Module
         full_name = [const.name, name].join('::')
         unless skip?(full_name)
           skip_names << full_name
+          puts "preloading #{full_name}" if debug
           child = begin
             const.const_get(name)
           rescue NameError => e
