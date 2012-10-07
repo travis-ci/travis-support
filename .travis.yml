@@ -1,7 +1,6 @@
 language: ruby
 rvm:
-  - 1.9.2
-  - jruby-18mode
+  - 1.9.3
   - jruby-19mode
   - jruby-head
 jdk:
@@ -11,8 +10,10 @@ jdk:
 services:
   - rabbitmq
 matrix:
+  allow_failures:
+    - rvm: jruby-head
   exclude:
-    - rvm: 1.9.2
+    - rvm: 1.9.3
       jdk: openjdk7
-    - rvm: 1.9.2
+    - rvm: 1.9.3
       jdk: oraclejdk7
