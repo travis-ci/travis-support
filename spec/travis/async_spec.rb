@@ -78,11 +78,6 @@ describe Travis::Async do
       async_object.new.async_method
       Travis::Async.queues.keys.should == ['Class']
     end
-
-    it 'queues the method call' do
-      async_object.new.async_method
-      Travis::Async.queues['Class'].items.size.should == 1
-    end
   end
 
   describe 'Travis::Async.enabled' do
