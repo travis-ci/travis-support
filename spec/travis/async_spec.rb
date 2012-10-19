@@ -8,6 +8,7 @@ describe Travis::Async do
 
   after :each do
     Travis::Async.enabled = false
+    Travis::Async.queues.clear
   end
 
   describe 'declaring a method as async' do
@@ -60,6 +61,49 @@ describe Travis::Async do
 
       sleep(0.7)
       sleeper.total_done.should == 5
+    end
+  end
+
+  describe 'when not defining a queue' do
+    let(:async_object) do
+      Class.new do
+        extend Travis::Async
+        def self.name; 'Class' end
+        def async_method; end
+        async :async_method
+      end
+    end
+
+    it "uses the given object's class name as queue name" do
+      async_object.new.async_method
+      Travis::Async.queues.keys.should == ['Class']
+    end
+
+    it 'queues the method call' do
+      async_object.new.async_method
+      Travis::Async.queues['Class'].items.size.should == 1
+    end
+  end
+
+  describe 'Travis::Async.enabled' do
+    let(:async_object) do
+      Class.new do
+        extend Travis::Async
+        def async_method; end
+        async :async_method
+      end
+    end
+
+    it 'enables queueing' do
+      Travis::Async.enabled = true
+      async_object.new.async_method
+      Travis::Async.queues.should_not be_empty
+    end
+
+    it 'disables queueing' do
+      Travis::Async.enabled = false
+      async_object.new.async_method
+      Travis::Async.queues.should be_empty
     end
   end
 end

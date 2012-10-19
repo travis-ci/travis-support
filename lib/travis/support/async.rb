@@ -28,13 +28,16 @@ module Travis
     end
 
     def async(name, options = {})
-      if Async.enabled?
-        prepend_to name do |object, method, *args, &block|
+      prepend_to name do |object, method, *args, &block|
+        if Async.enabled?
           uuid = Travis.uuid
-          Async.run(options[:queue]) do
+          queue = options[:queue] || object.class.name
+          Async.run(queue) do
             Travis.uuid = uuid
             method.call(*args, &block)
           end
+        else
+          method.call(*args, &block)
         end
       end
     end
