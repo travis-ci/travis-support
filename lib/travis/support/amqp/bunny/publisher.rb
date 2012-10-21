@@ -1,4 +1,3 @@
-require 'bunny'
 require 'multi_json'
 require 'metriks'
 

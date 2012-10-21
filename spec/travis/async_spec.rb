@@ -8,7 +8,7 @@ describe Travis::Async do
 
   after :each do
     Travis::Async.enabled = false
-    Travis::Async.queues.clear
+    Travis::Async::Threaded.queues.clear
   end
 
   describe 'declaring a method as async' do
@@ -36,35 +36,9 @@ describe Travis::Async do
         end
       end
     end
-
-    let(:sleeper) { async_sleep.new }
-
-    it 'processes work in a separate thread, synchronized per queue' do
-      1.upto(5) do
-        sleeper.sleep_in_queue_1(0.2)
-      end
-
-      sleep(0.05)
-      sleeper.done[1].should == 0
-
-      1.upto(5) do |ix|
-        sleep(0.2)
-        sleeper.done[1].should == ix
-      end
-    end
-
-    it 'processes work in a separate thread, asynchronous in multiple queues' do
-      1.upto(5) { |queue| sleeper.send(:"sleep_in_queue_#{queue}", 0.5) }
-
-      sleep(0.05)
-      sleeper.total_done.should == 0
-
-      sleep(0.7)
-      sleeper.total_done.should == 5
-    end
   end
 
-  describe 'when not defining a queue' do
+  describe 'queue name' do
     let(:async_object) do
       Class.new do
         extend Travis::Async
@@ -76,7 +50,7 @@ describe Travis::Async do
 
     it "uses the given object's class name as queue name" do
       async_object.new.async_method
-      Travis::Async.queues.keys.should == ['Class']
+      Travis::Async::Threaded.queues.keys.should == ['Class']
     end
   end
 
@@ -92,13 +66,13 @@ describe Travis::Async do
     it 'enables queueing' do
       Travis::Async.enabled = true
       async_object.new.async_method
-      Travis::Async.queues.should_not be_empty
+      Travis::Async::Threaded.queues.should_not be_empty
     end
 
     it 'disables queueing' do
       Travis::Async.enabled = false
       async_object.new.async_method
-      Travis::Async.queues.should be_empty
+      Travis::Async::Threaded.queues.should be_empty
     end
   end
 end

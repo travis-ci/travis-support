@@ -1,5 +1,3 @@
-require 'bunny'
-
 module Travis
   module Amqp
     autoload :Publisher, 'travis/support/amqp/bunny/publisher'
@@ -22,8 +20,11 @@ module Travis
       end
 
       def connection
-        @connection ||= Bunny.new(config, :spec => '09').tap do |bunny|
+        @connection ||=  begin
+          require 'bunny'
+          bunny = Bunny.new(config, :spec => '09')
           bunny.start
+          bunny
         end
       end
       alias :connect :connection
