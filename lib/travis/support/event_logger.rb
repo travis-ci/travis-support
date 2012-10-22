@@ -7,7 +7,7 @@ module Travis
   #
   # Simple example:
   #
-  #   Travis::EventLogger.subscirbe('request') { |_, data| puts data[:payload] }
+  #   Travis::EventLogger.subscribe('request') { |_, data| puts data[:payload] }
   #   Travis::EventLogger.notify('request', 'hi there!')
   #
   # Output:
