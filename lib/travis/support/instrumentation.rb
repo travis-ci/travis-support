@@ -10,7 +10,9 @@ module Travis
 
     class << self
       def setup
-        Metriks::Reporter::Logger.new.start
+        logger = Logger.new($stdout)
+        logger.formatter = proc { |severity, time, progname, msg| msg }
+        Metriks::Reporter::Logger.new(:logger => logger).start
       end
 
       def meter(event, args)
