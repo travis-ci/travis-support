@@ -1,9 +1,9 @@
 require 'active_support/notifications'
 require 'active_support/core_ext/string/inflections'
+require 'active_support/core_ext/logger'
 require 'securerandom' # wat
 require 'metriks'
 require 'metriks/reporter/logger'
-require 'logger'
 
 module Travis
   module Instrumentation
@@ -11,9 +11,7 @@ module Travis
 
     class << self
       def setup
-        logger = Logger.new($stdout)
-        logger.formatter = Logger::SimpleFormatter.new
-        Metriks::Reporter::Logger.new(logger: logger).start
+        Metriks::Reporter::Logger.new.start
       end
 
       def meter(event, args)
