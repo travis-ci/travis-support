@@ -18,6 +18,7 @@ module Travis
         exchange.publish(data, deep_merge(default_data, options))
         track_event
       rescue StandardError => e
+        Exceptions.handle(e)
         track_event(:failed)
         nil
       end
