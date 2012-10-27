@@ -10,7 +10,7 @@ module Travis
           rescue options[:from] || Exception => e
             Exceptions.handle(e)
           end
-        end
+        end unless Travis.env == 'test'
       end
     end
   end
