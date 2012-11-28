@@ -28,46 +28,31 @@ module Travis
     end
 
     def instrument(name, options = {})
-      instrument_method(name, options)
-      subscribe_method(name, options)
+      wrapped = "#{name}_without_instrumentation"
+      alias_method(wrapped, name)
+      remove_method(name)
+      private(wrapped)
+      class_eval instrumentation_template(name, options[:scope], wrapped, options[:level] || :info)
     end
 
     private
 
-      def subscribed?(event)
-        ActiveSupport::Notifications.notifier.listening?(event)
-      end
-
-      def subscribe_method(name, options)
-        namespace = self.name.underscore.gsub('/', '.')
-        event = /^#{namespace}\.(.+\.)?#{name}(:(completed|failed))?$/
-        ActiveSupport::Notifications.subscribe(event, &Instrumentation.method(:meter)) unless subscribed?(event)
-      end
-
-      def instrument_method(name, options)
-        wrapped = "#{name}_without_instrumentation"
-        rename_method(name, wrapped)
-        class_eval instrumentation_template(name, options[:scope], wrapped, options[:level] || :info)
-      end
-
-      def rename_method(old_name, new_name)
-        alias_method(new_name, old_name)
-        remove_method(old_name)
-        private(new_name)
-      end
-
       def instrumentation_template(name, scope, wrapped, level)
-        as = 'ActiveSupport::Notifications.publish "#{event}:%s", :target => self, :args => args, :started_at => started_at, :level => ' + level.inspect
+        options = ':target => self, :args => args, :started_at => started_at, :level => ' + level.inspect
+        meter   = 'Travis::Instrumentation.meter "#{event}:%s", ' + options
+        publish = 'ActiveSupport::Notifications.publish "#{event}:%s", ' + options
         <<-RUBY
           def #{name}(*args, &block)
             started_at = Time.now.to_f
             event = self.class.name.underscore.gsub("/", ".") #{"<< '.' << #{scope}" if scope} << ".#{name}"
-            #{as % 'received'}
+            #{publish % 'received'}
             result = #{wrapped}(*args, &block)
-            #{as % 'completed'}, :finished_at => Time.now.to_f, :result => result
+            #{meter   % 'completed'}, :finished_at => Time.now.to_f, :result => result
+            #{publish % 'completed'}, :finished_at => Time.now.to_f, :result => result
             result
           rescue Exception => e
-            #{as % 'failed'}, :exception => [e.class.name, e.message]
+            #{meter   % 'failed'}, :exception => [e.class.name, e.message]
+            #{publish % 'failed'}, :exception => [e.class.name, e.message]
             raise
           end
         RUBY

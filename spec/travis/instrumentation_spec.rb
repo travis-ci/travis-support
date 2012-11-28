@@ -77,17 +77,6 @@ describe Travis::Instrumentation do
     end
   end
 
-  describe 'subscriptions' do
-    before :each  do
-      ActiveSupport::Notifications.stubs(:subscribe)
-    end
-
-    it 'subscribes to AS::Notification events on this class and namespaced classes' do
-      ActiveSupport::Notifications.expects(:subscribe)
-      object.tracked
-    end
-  end
-
   describe 'calling the method' do
     it 'meters execution of the method' do
       Metriks.expects(:timer).with('v1.travis.foo.bar.baz.tracked:completed').returns(timer)
