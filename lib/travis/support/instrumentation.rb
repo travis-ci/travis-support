@@ -11,6 +11,7 @@ module Travis
 
     class << self
       def setup
+        Travis.logger.info("Starting metriks reporter logger.")
         Metriks::Reporter::Logger.new.start
       end
 
