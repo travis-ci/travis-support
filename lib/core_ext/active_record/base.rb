@@ -8,6 +8,15 @@ class ActiveRecord::Base
       'sqlite3'    => 'round(%s - 0.5)'
     }
   }
+
+  def to_json(*)
+    raise NotImplementedError
+  end
+
+  def as_json(*)
+    raise NotImplementedError
+  end
+
   class << self
     def floor(field)
       SQL[:floor][adapter] % field
