@@ -26,9 +26,11 @@ module Travis
         end
 
         def run(target, method, options, *args)
-          queue  = options[:queue]
-          target = target.name if target.is_a?(Module)
-          ::Sidekiq::Client.push('queue' => queue, 'class' => Worker, 'args' => [Travis.uuid, target, method, *args])
+          queue   = options[:queue]
+          retries = options[:retries]
+          target  = target.name if target.is_a?(Module)
+          args    = [Travis.uuid, target, method, *args]
+          ::Sidekiq::Client.push('queue' => queue, 'retries' => retries, 'class' => Worker, 'args' => args)
         end
       end
     end
