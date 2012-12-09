@@ -15,10 +15,10 @@ module Travis
         Metriks::Reporter::Logger.new.start
       end
 
-      def meter(event, args)
-        return if args[:level] == :debug
+      def meter(event, options = {})
+        return if options[:level] == :debug
         event = "#{METRICS_VERSION}.#{event}"
-        started_at, finished_at = args[:started_at], args[:finished_at]
+        started_at, finished_at = options[:started_at], options[:finished_at]
 
         if finished_at
           Metriks.timer(event).update(finished_at - started_at)
