@@ -1,5 +1,7 @@
 require 'active_record'
 
+class Travis::MethodNeedsToBeOverridenError < StandardError; end
+
 class ActiveRecord::Base
   SQL = {
     :floor => {
@@ -8,6 +10,15 @@ class ActiveRecord::Base
       'sqlite3'    => 'round(%s - 0.5)'
     }
   }
+
+  def to_json(*)
+    raise Travis::MethodNeedsToBeOverridenError
+  end
+
+  def as_json(*)
+    raise Travis::MethodNeedsToBeOverridenError
+  end
+
   class << self
     def floor(field)
       SQL[:floor][adapter] % field
