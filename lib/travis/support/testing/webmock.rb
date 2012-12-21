@@ -44,13 +44,17 @@ module Travis
             end
 
             def filename
-              @filename ||= "spec/fixtures/github/#{path}"
+              @filename ||= "spec/fixtures/github/#{escape(path)}"
             end
 
             def path
               path = uri.path
               path += "?#{uri.query}" if uri.query
               "#{uri.host}#{path}.json"
+            end
+
+            def escape(path)
+              path.gsub(/[\W-]+/, '_')
             end
         end
 
