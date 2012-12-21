@@ -54,7 +54,7 @@ module Travis
             end
 
             def escape(path)
-              path.gsub(/[\W-]+/, '_')
+              path.gsub(/[^\w\.\-\/]+/, '_')
             end
         end
 

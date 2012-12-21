@@ -1,5 +1,7 @@
 require 'active_record'
 
+class Travis::MethodNeedsToBeOverridenError < StandardError; end
+
 class ActiveRecord::Base
   SQL = {
     :floor => {
@@ -10,11 +12,11 @@ class ActiveRecord::Base
   }
 
   def to_json(*)
-    raise NotImplementedError
+    raise Travis::MethodNeedsToBeOverridenError
   end
 
   def as_json(*)
-    raise NotImplementedError
+    raise Travis::MethodNeedsToBeOverridenError
   end
 
   class << self
