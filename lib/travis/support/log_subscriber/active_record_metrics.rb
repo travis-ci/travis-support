@@ -27,6 +27,11 @@ module Travis
         Metriks.timer(metric_name).update(duration)
       end
 
+      # need to define a logger outside of rails so events won't be skipped
+      def logger
+        Travis.logger
+      end
+
       private
 
         def log_update?(sql)
