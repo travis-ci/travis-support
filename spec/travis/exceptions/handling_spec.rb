@@ -26,6 +26,10 @@ describe Travis::Exceptions::Handling do
 
   let(:object) { klass.new }
 
+  before do
+    Travis.stubs(:env).returns "development"
+  end
+
   it 'calls the original implementation' do
     object.outer
     object.called.should be_true
