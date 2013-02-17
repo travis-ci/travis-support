@@ -3,7 +3,7 @@ module Travis
     extend self
 
     def obfuscate_env_vars(line)
-      regex = /(?<=\=)(?:[^'"\=\s]+|(?<q>['"]).*?\k<q>)/
+      regex = /(?<=\=)(?:(?<q>['"]).*?[^\\]\k<q>|(.*?)(?= \w+=|$))/
       line.gsub(regex) { |val| '[secure]' }
     end
   end
