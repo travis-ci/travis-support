@@ -5,6 +5,7 @@ module Travis
   autoload :Amqp,            'travis/support/amqp'
   autoload :Assertions,      'travis/support/assertions'
   autoload :Async,           'travis/support/async'
+  autoload :Chunkifier,      'travis/support/chunkifier'
   autoload :Database,        'travis/support/database'
   autoload :Exceptions,      'travis/support/exceptions'
   autoload :Helpers,         'travis/support/helpers'
