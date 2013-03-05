@@ -15,7 +15,7 @@ module Travis
     end
 
     context 'with non-UTF8 chars' do
-      let(:content) { "\xC2".force_encoding('ASCII-8BIT') }
+      let(:content) { "\xC2\xE2".force_encoding('ASCII-8BIT') }
 
       its(:parts) { should == [content] }
     end
