@@ -6,6 +6,8 @@ module Travis
       super
 
       self.options ||= {}
+
+      @chunk_split_size = options[:chunk_split_size]
     end
 
     def json?
@@ -44,12 +46,17 @@ module Travis
     end
 
     def chunk_split_size
-      size = chunk_size / 10
-      size == 0 ? 1 : size
+      @chunk_split_size || begin
+        size = chunk_size / 10
+        size == 0 ? 1 : size
+      end
     end
 
     def too_big?(current_chunk)
-      current_chunk = current_chunk.to_json if json?
+      if json?
+        current_chunk = current_chunk.to_s.encode('UTF-8', {:invalid => :replace, :undef => :replace, :replace => '??'})
+        current_chunk = current_chunk.to_json
+      end
       current_chunk.bytesize > chunk_size
     end
   end

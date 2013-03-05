@@ -1,11 +1,12 @@
 # encoding: utf-8
 require 'spec_helper'
+require 'json'
 
 module Travis
   describe Chunkifier do
     let(:chunk_size) { 15 }
-    let(:chunk_split_size) { 5 }
-    let(:subject) { Chunkifier.new(content, chunk_size, :json => true) }
+    let(:chunk_split_size) { 1 }
+    let(:subject) { Chunkifier.new(content, chunk_size, :json => true, :chunk_split_size => chunk_split_size) }
 
     context 'with newlines' do
       let(:content) { "01\n234501\n234501\n2345" }
@@ -13,8 +14,13 @@ module Travis
       its(:parts) { should == ["01\n234501\n2", "34501\n2345"] }
     end
 
+    context 'with non-UTF8 chars' do
+      let(:content) { "\xC2".force_encoding('ASCII-8BIT') }
+
+      its(:parts) { should == [content] }
+    end
+
     context 'with UTF-8 chars' do
-      let(:chunk_split_size) { 1 }
       let(:content) { "𤭢abcą" }
 
       its(:parts) { should == ["𤭢abc", "ą"] }
