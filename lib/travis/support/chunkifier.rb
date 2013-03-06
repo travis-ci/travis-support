@@ -1,3 +1,5 @@
+require 'active_support/json'
+
 module Travis
   class Chunkifier < Struct.new(:content, :chunk_size, :options)
     include Enumerable

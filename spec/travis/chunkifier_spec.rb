@@ -28,6 +28,7 @@ module Travis
       it 'should keep parts under chunk_size taking into account conversion to json and bytes' do
         subject.parts.map { |p| p.to_json.bytesize }.should == [11, 8]
       end
+
     end
 
     context 'with bigger chunk_size' do
@@ -37,6 +38,11 @@ module Travis
       it 'should keep parts under chunk_size taking into account conversion to json and bytes' do
         subject.parts.all? { |p| p.to_json.bytesize <= 100 }.should be_true
       end
+    end
+
+    it 'encodes UTF-8 chars' do
+      chunkifier = Chunkifier.new("とと", 8, :json => true)
+      chunkifier.parts.length.should == 2
     end
   end
 end
