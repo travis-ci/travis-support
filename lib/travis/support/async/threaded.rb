@@ -1,3 +1,5 @@
+require 'thread'
+
 module Travis
   module Async
     module Threaded
@@ -12,18 +14,24 @@ module Travis
         end
 
         def work
-          @items.pop.call
+          items.pop.call
         end
 
         def <<(item)
-          @items.push(item)
+          items.push(item)
+        end
+
+        def size
+          items.size
         end
       end
 
       class << self
         def run(target, method, options, *args, &block)
           uuid = Travis.uuid
-          queue(options[:queue]) << lambda { call(uuid, target, method, *args, &block) }
+          queue = queue(options[:queue])
+          queue << lambda { call(uuid, target, method, *args, &block) }
+          Travis.logger.info "[#{Thread.current.object_id}] Queue #{queue.name} size: #{queue.size}"
         end
 
         def call(uuid, target, method, *args, &block)
