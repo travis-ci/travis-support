@@ -3,6 +3,7 @@ require 'core_ext/module/prepend_to'
 
 module Travis
   module Async
+    autoload :Inline,   'travis/support/async/inline'
     autoload :Sidekiq,  'travis/support/async/sidekiq'
     autoload :Threaded, 'travis/support/async/threaded'
 
@@ -30,7 +31,7 @@ module Travis
       end
 
       def strategy(name)
-        const_get(camelize(name || 'threaded'))
+        const_get(camelize(name || 'inline'))
       end
 
       def camelize(string)

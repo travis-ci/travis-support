@@ -44,7 +44,7 @@ describe Travis::Async do
         extend Travis::Async
         def self.name; 'Class' end
         def async_method; end
-        async :async_method
+        async :async_method, use: :threaded
       end
     end
 
@@ -59,7 +59,7 @@ describe Travis::Async do
       Class.new do
         extend Travis::Async
         def async_method; end
-        async :async_method
+        async :async_method, use: :threaded
       end
     end
 
@@ -73,6 +73,23 @@ describe Travis::Async do
       Travis::Async.enabled = false
       async_object.new.async_method
       Travis::Async::Threaded.queues.should be_empty
+    end
+  end
+
+  describe 'Travis::Async::Inline' do
+    let(:target) do
+      Class.new do
+        def perform; end
+      end
+    end
+
+    it 'is the default strategy' do
+      Travis::Async.strategy(nil) == 'Inline'
+    end
+
+    it 'calls the method inline' do
+      target.expects(:perform).with(:foo)
+      Travis::Async.run(target, :perform, { use: :inline }, :foo)
     end
   end
 end
