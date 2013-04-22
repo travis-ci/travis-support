@@ -8,7 +8,7 @@ gem 'json', '~> 1.7.7'
 gem 'gem-patching'
 
 gem 'metriks',         :git => 'https://github.com/roidrage/metriks.git', :ref => 'source'
-gem 'hubble',          :git => 'https://github.com/roidrage/hubble.git'
+gem 'sentry-raven',    :github => 'getsentry/raven-ruby'
 gem 'newrelic_rpm',    '~> 3.3.2'
 
 platform :mri do

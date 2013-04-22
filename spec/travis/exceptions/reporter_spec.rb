@@ -1,15 +1,13 @@
 require 'spec_helper'
-require 'hubble'
+require 'raven'
 
 describe Travis::Exceptions::Reporter do
   let(:reporter) { Travis::Exceptions::Reporter.new }
 
   before :each do
     Travis::Exceptions::Reporter.queue = Queue.new
-    Travis.stubs(:config).returns(stub(:ssl => {}))
+    Travis.stubs(:config).returns(stub(:sentry => stub(:dsn => '')))
     reporter.stubs(:enabled?).returns(true)
-    Hubble.config['backend_name'] = 'memory'
-    Hubble.raise_errors = false
   end
 
   it "setup a queue" do
@@ -23,7 +21,7 @@ describe Travis::Exceptions::Reporter do
   end
 
   it "should report an error when something is on the queue" do
-    Hubble.expects(:report)
+    Raven.expects(:capture_exception)
     reporter.queue.push(StandardError.new)
     reporter.pop
   end
@@ -46,17 +44,21 @@ describe Travis::Exceptions::Reporter do
       end
     end.new
 
-    reporter.handle(exception)
+    metadata = reporter.metadata_for(exception)
 
-    reported = Hubble.backend.reports.first
-    reported['metadata'].should == 'metadata'
+    Raven.expects(:capture_exception).with(exception, extra: metadata)
+    reporter.handle(exception)
   end
 
   it "should add the travis environment to hubble" do
     exception = StandardError.new
+
+    metadata = reporter.metadata_for(exception)
+    Raven.expects(:capture_exception).with(exception, extra: metadata)
+
     reporter.handle(exception)
-    reported = Hubble.backend.reports.first
-    reported["env"].should == Travis.env
+
+    metadata['env'].should == 'development'
   end
 end
 
