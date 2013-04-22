@@ -1,4 +1,5 @@
 require 'spec_helper'
+require 'hubble'
 
 describe Travis::Exceptions::Reporter do
   let(:reporter) { Travis::Exceptions::Reporter.new }
@@ -6,7 +7,7 @@ describe Travis::Exceptions::Reporter do
   before :each do
     Travis::Exceptions::Reporter.queue = Queue.new
     Travis.stubs(:config).returns(stub(:ssl => {}))
-    reporter.stubs(:hubble?).returns(true)
+    reporter.stubs(:enabled?).returns(true)
     Hubble.config['backend_name'] = 'memory'
     Hubble.raise_errors = false
   end

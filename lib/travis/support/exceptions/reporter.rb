@@ -1,5 +1,4 @@
 require 'thread'
-require 'hubble'
 require 'active_support/core_ext/class/attribute'
 
 module Travis
@@ -15,6 +14,15 @@ module Travis
         def enqueue(error)
           queue.push(error)
         end
+
+        def enabled?
+          @enabled ||= begin
+            require 'hubble'
+            !!ENV['HUBBLE_ENV']
+          rescue LoadError => e
+            false
+          end
+        end
       end
 
       class_attribute :queue
@@ -23,15 +31,11 @@ module Travis
       attr_accessor :thread
 
       def run
-        if hubble?
+        if enabled?
           Hubble.setup
           Hubble.config['ssl'] = Travis.config.ssl
         end
         @thread = Thread.new &method(:error_loop)
-      end
-
-      def hubble?
-        !!ENV['HUBBLE_ENV']
       end
 
       def error_loop
@@ -45,7 +49,7 @@ module Travis
 
       def handle(error)
         Travis.logger.error(message_for(error))
-        Hubble.report(error, metadata_for(error)) if hubble?
+        Hubble.report(error, metadata_for(error)) if enabled?
       rescue Exception => e
         puts '---- FAILSAFE ----'
         puts "Error while handling exception: #{e.message}"
@@ -63,6 +67,12 @@ module Travis
         metadata = { 'env' => Travis.env, 'codename' => ENV['CODENAME'] }
         metadata.merge!(error.metadata) if error.respond_to?(:metadata)
         metadata
+      end
+      
+      private
+      
+      def enabled?
+        self.class.enabled?
       end
     end
   end
