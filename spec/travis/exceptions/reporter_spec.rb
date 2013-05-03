@@ -37,7 +37,7 @@ describe Travis::Exceptions::Reporter do
     reporter.queue.pop.should == error
   end
 
-  it "should add custom metadata to hubble" do
+  it "should add custom metadata to raven" do
     exception = Class.new(StandardError) do
       def metadata
         { 'metadata' => 'metadata' }
@@ -50,7 +50,7 @@ describe Travis::Exceptions::Reporter do
     reporter.handle(exception)
   end
 
-  it "should add the travis environment to hubble" do
+  it "should add the travis environment to raven" do
     exception = StandardError.new
 
     metadata = reporter.metadata_for(exception)
