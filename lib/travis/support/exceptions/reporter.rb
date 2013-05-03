@@ -34,6 +34,7 @@ module Travis
         if enabled?
           ::Raven.configure do |config|
             config.dsn = Travis.config.sentry.dsn
+            config.current_environment = Travis.env
           end
         end
         @thread = Thread.new &method(:error_loop)
@@ -66,7 +67,7 @@ module Travis
       end
 
       def metadata_for(error)
-        metadata = { 'env' => Travis.env, 'codename' => ENV['CODENAME'] }
+        metadata = { }
         metadata.merge!(error.metadata) if error.respond_to?(:metadata)
         metadata
       end

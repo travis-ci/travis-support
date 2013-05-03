@@ -49,16 +49,5 @@ describe Travis::Exceptions::Reporter do
     Raven.expects(:capture_exception).with(exception, extra: metadata)
     reporter.handle(exception)
   end
-
-  it "should add the travis environment to raven" do
-    exception = StandardError.new
-
-    metadata = reporter.metadata_for(exception)
-    Raven.expects(:capture_exception).with(exception, extra: metadata)
-
-    reporter.handle(exception)
-
-    metadata['env'].should == 'development'
-  end
 end
 
