@@ -35,7 +35,7 @@ module Travis
           ::Raven.configure do |config|
             config.dsn = Travis.config.sentry.dsn
             config.ssl = Travis.config.ssl if Travis.config.ssl
-            config.logger = Travis.logger
+            config.logger = Travis.logger  if Travis.logger
             config.current_environment = Travis.env
           end
         end
