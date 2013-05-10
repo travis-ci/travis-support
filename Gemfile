@@ -20,7 +20,7 @@ end
 platform :jruby do
   gem 'hot_bunnies',   '~> 1.3.4'
   gem 'net-ssh-shell', '~> 0.2.0'
-  gem 'jruby-openssl', '~> 0.7.4'
+  gem 'jruby-openssl', '~> 0.8.8'
 end
 
 group :test do
