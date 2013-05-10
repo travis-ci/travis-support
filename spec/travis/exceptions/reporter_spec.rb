@@ -6,7 +6,7 @@ describe Travis::Exceptions::Reporter do
 
   before :each do
     Travis::Exceptions::Reporter.queue = Queue.new
-    Travis.stubs(:config).returns(stub(:sentry => stub(:dsn => '')))
+    Travis.stubs(:config).returns(stub(:sentry => stub(:dsn => ''), :ssl => ''))
     reporter.stubs(:enabled?).returns(true)
   end
 
