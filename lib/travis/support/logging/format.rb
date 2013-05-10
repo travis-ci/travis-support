@@ -3,11 +3,11 @@ module Travis
     module Format
       class << self
         def format(severity, time, progname, msg)
-          "#{severity[0, 1]} [#{format_time(time)}] #{msg}\n"
+          "#{format_time(time)} #{$$} #{severity} #{msg}\n"
         end
 
         def format_time(time)
-          time.strftime("%Y-%m-%d %H:%M:%S.") << time.usec.to_s[0, 3]
+          time.strftime("%Y-%m-%dT%l:%M:%S.%6N%:z")
         end
 
         def before(object, name, args)
