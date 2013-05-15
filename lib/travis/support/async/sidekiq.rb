@@ -30,7 +30,7 @@ module Travis
           retries = options[:retries]
           target  = target.name if target.is_a?(Module)
           args    = [Travis.uuid, target, method, *args]
-          ::Sidekiq::Client.push('queue' => queue, 'retries' => retries, 'class' => Worker, 'args' => args)
+          ::Sidekiq::Client.push('queue' => queue, 'retry' => retries, 'class' => Worker, 'args' => args)
         end
       end
     end
