@@ -6,9 +6,6 @@ module Travis
     # A simple exception reporting queue that has a run loop in a separate
     # thread. Queued exceptions will be pushed to Sentry and logged.
     class Reporter
-      autoload :Raven,  'travis/support/exceptions/reporter/raven'
-      autoload :Logger, 'travis/support/exceptions/reporter/logger'
-
       class << self
         def start
           Reporter.new.run
