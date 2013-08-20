@@ -50,8 +50,12 @@ module Travis
         nil
       end
 
+      def channel
+        @channel ||= Amqp.connection.create_channel
+      end
+
       def exchange
-        @exchange ||= self.class.channel.exchange(name, type: :fanout)
+        @exchange ||= channel.exchange(name, type: :fanout)
       end
     end
   end
