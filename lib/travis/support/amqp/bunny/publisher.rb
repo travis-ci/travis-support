@@ -43,5 +43,25 @@ module Travis
           Metriks.meter("#{meter_name}.#{routing_key}").mark
         end
     end
+
+    class FanoutPublisher
+      attr_reader :name
+
+      def initialize(name)
+        @name = name
+      end
+
+      def publish(data, options = {})
+        data = MultiJson.encode(data)
+        exchange.publish(data)
+      rescue StandardError => e
+        Exceptions.handle(e)
+        nil
+      end
+
+      def exchange
+        @exchange ||= Amqp.connection.exchange(name, type: :fanout)
+      end
+    end
   end
 end

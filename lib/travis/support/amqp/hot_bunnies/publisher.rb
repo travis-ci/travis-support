@@ -34,5 +34,25 @@ module Travis
           hash.merge(other, &(merger = proc { |key, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : v2 }))
         end
     end
+
+    class FanoutPublisher
+      attr_reader :name
+
+      def initialize(name)
+        @name = name
+      end
+
+      def publish(data)
+        data = MultiJson.encode(data)
+        exchange.publish(data)
+      rescue StandardError => e
+        Exceptions.handle(e)
+        nil
+      end
+
+      def exchange
+        @exchange ||= self.class.channel.exchange(name, type: :fanout)
+      end
+    end
   end
 end
