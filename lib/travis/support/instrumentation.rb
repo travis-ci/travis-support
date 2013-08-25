@@ -28,6 +28,14 @@ module Travis
       end
     end
 
+    def instrumentation_key=(instrumentation_key)
+      @@instrumentation_key = instrumentation_key
+    end
+
+    def instrumentation_key
+      @@instrumentation_key ||= name.underscore.gsub('/', '.')
+    end
+
     def instrument(name, options = {})
       wrapped = "#{name}_without_instrumentation"
       alias_method(wrapped, name)
@@ -45,7 +53,7 @@ module Travis
         <<-RUBY
           def #{name}(*args, &block)
             started_at = Time.now.to_f
-            event = self.class.name.underscore.gsub("/", ".") #{"<< '.' << #{scope}" if scope} << ".#{name}"
+            event = self.class.instrumentation_key.dup #{"<< '.' << #{scope}" if scope} << ".#{name}"
             #{publish % 'received'}
             result = #{wrapped}(*args, &block)
             #{meter   % 'completed'}, :finished_at => Time.now.to_f, :result => result

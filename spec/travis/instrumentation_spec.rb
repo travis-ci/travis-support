@@ -30,12 +30,13 @@ describe Travis::Instrumentation do
   let(:events) { [] }
 
   before :each do
-    @subscriber = ActiveSupport::Notifications.subscribe /travis.foo.bar.baz/ do |key, args|
+    @subscriber = ActiveSupport::Notifications.subscribe /travis\./ do |key, args|
       events << [key, args]
     end
   end
 
   after :each do
+    klass.instrumentation_key = nil
     ActiveSupport::Notifications.unsubscribe(@subscriber)
   end
 
@@ -74,6 +75,24 @@ describe Travis::Instrumentation do
     it 'sends out just two notifications' do
       object.tracked('foo')
       events.size.should == 2
+    end
+  end
+
+  describe 'inheriting classes' do
+    let(:child)  { Class.new(klass) { def self.name; 'Travis::Something'; end } }
+    let(:object) { child.new }
+
+    it "use the child class name as the instrumentation key by default" do
+      object.tracked('foo')
+      key, args = events.first
+      key.should == 'travis.something.baz.tracked:received'
+    end
+
+    it "can overwrite the instrumentation key" do
+      child.instrumentation_key = 'travis.something.else'
+      object.tracked('foo')
+      key, args = events.first
+      key.should == 'travis.something.else.baz.tracked:received'
     end
   end
 
