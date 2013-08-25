@@ -7,7 +7,7 @@ describe Travis::Exceptions::Reporter do
 
   before :each do
     Travis::Exceptions::Reporter.queue = Queue.new
-    Travis.stubs(:config).returns(Hashr.new)
+    Travis.stubs(:config).returns(Hashr.new(sentry: {}))
   end
 
   it "setup a queue" do
