@@ -29,11 +29,11 @@ module Travis
     end
 
     def instrumentation_key=(instrumentation_key)
-      @@instrumentation_key = instrumentation_key
+      @instrumentation_key = instrumentation_key
     end
 
     def instrumentation_key
-      @@instrumentation_key ||= name.underscore.gsub('/', '.')
+      @instrumentation_key ||= name.underscore.gsub('/', '.')
     end
 
     def instrument(name, options = {})

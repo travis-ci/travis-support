@@ -96,6 +96,17 @@ describe Travis::Instrumentation do
     end
   end
 
+  describe 'instrumentation_key' do
+    it 'holds separate values on different classes' do
+      one = Class.new(klass) { def self.name; 'Travis::One'; end }
+      two = Class.new(klass) { def self.name; 'Travis::Two'; end }
+      one.instrumentation_key = 'travis.one.foo'
+      two.instrumentation_key = 'travis.two.bar'
+      one.instrumentation_key.should == 'travis.one.foo'
+      two.instrumentation_key.should == 'travis.two.bar'
+    end
+  end
+
   describe 'calling the method' do
     it 'meters execution of the method' do
       Metriks.expects(:timer).with('v1.travis.foo.bar.baz.tracked:completed').returns(timer)
