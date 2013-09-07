@@ -10,6 +10,7 @@ module Travis
   require 'travis/support/helpers'
   require 'travis/support/instrumentation'
   require 'travis/support/log_subscriber'
+  require 'travis/support/logger'
   require 'travis/support/logging'
   if RUBY_PLATFORM == 'java'
     require 'travis/support/memory'
@@ -22,14 +23,14 @@ module Travis
     end
 
     def logger
-      @logger ||= Logging.configure(Logger.new(STDOUT))
+      @logger ||= Logger.configure(Logger.new(STDOUT))
     end
 
     def logger=(logger)
-      @logger = Logging.configure(logger)
+      @logger = Logger.configure(logger)
     end
 
-    def uuid= (uuid)
+    def uuid=(uuid)
       Thread.current[:uuid] = uuid
     end
 

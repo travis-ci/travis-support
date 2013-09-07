@@ -2,13 +2,16 @@ module Travis
   module Exceptions
     module Adapter
       class Logger
+        attr_reader :logger
+
         def initialize(*)
+          @logger = Travis.logger
         end
 
         def handle(error, metadata = {})
-          Travis.logger.error error.message
-          Travis.logger.error metadata[:extra].map { |key, value| "#{key}: #{value}" } if metadata[:extra]
-          Travis.logger.error error.backtrace
+          logger.error error.message
+          logger.error metadata[:extra].map { |key, value| "#{key}: #{value}" } if metadata[:extra]
+          logger.error error.backtrace
         end
       end
     end
