@@ -1,14 +1,16 @@
 module Travis
   class Logger
     class Format
-      attr_reader :format
-
       def initialize(config = {})
-        @format = compile_format(config || {})
+        (class << self; self; end).class_eval <<-rb
+          def format(severity, time, progname, message)
+            #{compile_format(config || {})}
+          end
+        rb
       end
 
       def call(severity, time, progname, message)
-        eval format
+        format(severity, time, progname, message)
       end
 
       private
