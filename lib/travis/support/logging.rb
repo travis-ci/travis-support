@@ -39,7 +39,7 @@ module Travis
 
       def configure(logger)
         logger.tap do
-          logger.formatter = proc { |*args| FormatWithoutTimestamp.format(*args) }
+          logger.formatter = Format.new(config && config[:logger])
           logger.level = Logger.const_get(log_level.to_s.upcase)
         end
       end
@@ -53,10 +53,15 @@ module Travis
       end
 
       def log_level
-        case
-        when defined?(Travis::Worker) then Travis::Worker.config.log_level
-        when defined?(Travis.config)  then Travis.config.log_level
-        end || :debug
+        config && config.log_level || :debug
+      end
+
+      def config
+        if defined?(Travis::Worker)
+          Travis::Worker.config
+        elsif Travis.respond_to?(:config)
+          Travis.config
+        end
       end
     end
 
