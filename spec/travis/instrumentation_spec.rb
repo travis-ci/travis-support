@@ -1,5 +1,6 @@
 require 'spec_helper'
 require 'active_support/core_ext/hash/except'
+require 'metriks'
 
 describe Travis::Instrumentation do
   let(:klass) do
@@ -38,10 +39,6 @@ describe Travis::Instrumentation do
   after :each do
     klass.instrumentation_key = nil
     ActiveSupport::Notifications.unsubscribe(@subscriber)
-  end
-
-  before :each do
-    Metriks.stubs(:timer).returns(timer)
   end
 
   describe 'instruments the method' do
@@ -109,7 +106,7 @@ describe Travis::Instrumentation do
 
   describe 'calling the method' do
     it 'meters execution of the method' do
-      Metriks.expects(:timer).with('v1.travis.foo.bar.baz.tracked:completed').returns(timer)
+      Travis::Metrics.expects(:meter).with('travis.foo.bar.baz.tracked:completed', anything)
       object.tracked
     end
 
@@ -133,13 +130,13 @@ describe Travis::Instrumentation do
     end
 
     it 'meters that the method call is completed' do
-      Metriks.expects(:timer).with('v1.travis.foo.bar.baz.tracked:completed').returns(timer)
+      Travis::Metrics.expects(:meter).with('travis.foo.bar.baz.tracked:completed', anything)
       object.tracked
     end
 
     it 'meters that the method call has failed' do
       object.stubs(:inner).raises(StandardError)
-      Metriks.expects(:meter).with('v1.travis.foo.bar.baz.tracked:failed').returns(meter)
+      Travis::Metrics.expects(:meter).with('travis.foo.bar.baz.tracked:failed', anything)
       object.tracked rescue nil
     end
   end
