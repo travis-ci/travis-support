@@ -18,7 +18,7 @@ module Travis
 
         def graphite
           require 'metriks/reporter/graphite'
-          Metriks::Reporter::Graphite.new
+          Metriks::Reporter::Graphite.new(Travis.config.graphite)
         end
       end
     end
