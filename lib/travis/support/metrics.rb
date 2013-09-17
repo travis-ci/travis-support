@@ -18,7 +18,9 @@ module Travis
 
         def graphite
           require 'metriks/reporter/graphite'
-          Metriks::Reporter::Graphite.new(Travis.config.graphite)
+          options = Travis.config.graphite || {}
+          host, port = options.values_at(:host, :port)
+          Metriks::Reporter::Graphite.new(host, port)
         end
       end
     end
@@ -37,6 +39,9 @@ module Travis
         else
           Travis.logger.info('No metriks reporter configured.')
         end
+      rescue Exception => e
+        puts "Exception while starting metrics reporter:"
+        puts e.message, e.backtrace
       end
 
       def started?
