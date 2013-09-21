@@ -27,7 +27,9 @@ module Travis
 
     [:fatal, :error, :warn, :info, :debug].each do |level|
       define_method(level) do |msg, options = {}|
-        super(msg.chomp.split("\n").map { |line| prepend_header(line, options) }.join("\n") + "\n")
+        msg = msg.join("\n") if msg.respond_to?(:join)
+        msg = msg.chomp.split("\n").map { |line| prepend_header(line, options) }.join("\n") + "\n"
+        super(msg)
       end
     end
 
