@@ -36,6 +36,11 @@ describe Travis::Logging do
       object.do_something(:foo, :bar)
       io.string.should include('header')
     end
+
+    it 'includes the thread id' do
+      object.do_something(:foo, :bar)
+      expect(io.string).to match(/TID=\w+/)
+    end
   end
 
   describe '.log_level' do
