@@ -49,7 +49,11 @@ module Travis
       include Format
 
       def self.format(severity, time, progname, msg)
-        "#{severity[0, 1]} #{msg}\n"
+        "#{severity[0, 1]} TID=#{thread_id} #{msg}\n"
+      end
+
+      def self.thread_id
+        Thread.current.object_id.to_s(36)
       end
     end
   end
