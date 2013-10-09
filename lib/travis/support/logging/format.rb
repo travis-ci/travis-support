@@ -3,7 +3,11 @@ module Travis
     module Format
       class << self
         def format(severity, time, progname, msg)
-          "#{format_time(time)} #{$$} #{severity} #{msg}\n"
+          "#{format_time(time)} #{$$} #{severity} TID=#{thread_id} #{msg}\n"
+        end
+
+        def thread_id
+          Thread.current.object_id.to_s(36)
         end
 
         def format_time(time)
