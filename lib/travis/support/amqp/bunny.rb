@@ -13,7 +13,10 @@ module Travis
         config = config.dup
         config[:user] = config.delete(:username) if config[:username]
         config[:pass] = config.delete(:password) if config[:password]
-        config[:ssl]  = true if config.key?(:tls)
+        if config.key?(:tls)
+          config[:ssl]  = true
+          config[:tls]  = true
+        end
         @config = config
       end
 
