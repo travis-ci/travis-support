@@ -58,9 +58,13 @@ module Travis
     [:fatal, :error, :warn, :info, :debug].each do |level|
       define_method(level) do |*args|
         message, options = *args
-        options ||= {}
-        options[:log_header] ||= self.log_header
-        logger.send(level, message, options)
+        if logger.method(level).arity == -2
+          options ||= {}
+          options[:log_header] ||= self.log_header
+          logger.send(level, message, options)
+        else
+          logger.send(level, message)
+        end
       end
     end
 
