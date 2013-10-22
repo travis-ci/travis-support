@@ -20,8 +20,8 @@ describe Travis::Logging do
   let(:object) { Foo.new }
 
   before :each do
+    Travis.stubs(:config).returns(Hashr.new(log_level: :debug, logger: { process_id: true, thread_id: true }))
     Travis.logger = Travis::Logger.new(io)
-    Travis.stubs(:config).returns(Hashr.new(log_level: :info))
   end
 
   describe 'log' do
@@ -38,6 +38,11 @@ describe Travis::Logging do
     it 'includes the log header' do
       object.do_something(:foo, :bar)
       log.should include('header')
+    end
+
+    it 'includes the process id' do
+      object.do_something(:foo, :bar)
+      expect(io.string).to match(/PID=\w+/)
     end
 
     it 'includes the thread id' do

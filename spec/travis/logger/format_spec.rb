@@ -59,6 +59,17 @@ describe Travis::Logger::Format do
     log.should_not include(Process.pid.to_s)
   end
 
+  it 'includes the current thread id if config.thread_id is given' do
+    logger.formatter = Travis::Logger::Format.new(thread_id: true)
+    logger.info('message')
+    log.should include(Thread.current.object_id.to_s)
+  end
+
+  it 'does not include the current thread id if config.thread_id is not given' do
+    logger.info('message')
+    log.should_not include(Thread.current.object_id.to_s)
+  end
+
   it 'includes the process name if ENV["TRAVIS_PROCESS_NAME"] is present' do
     ENV['TRAVIS_PROCESS_NAME'] = 'hub.1'
     logger.info('message')

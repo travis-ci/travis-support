@@ -28,38 +28,9 @@ module Travis
     [:fatal, :error, :warn, :info, :debug].each do |level|
       define_method(level) do |msg, options = {}|
         msg = msg.join("\n") if msg.respond_to?(:join)
-        msg = msg.chomp.split("\n").map { |line| prepend_header(line, options) }.join("\n") + "\n"
+        msg = msg.chomp.split("\n").map { |line| Travis::Logging.prepend_header(line, options) }.join("\n") + "\n"
         super(msg)
       end
     end
-
-    def wrap(type, name, args, options = {})
-      send(type || :info, prepend_header("about to #{name}#{format_arguments(args)}", options)) unless options[:only] == :after
-      result = yield
-      send(type || :debug, prepend_header("done: #{name}", options)) unless options[:only] == :before
-      result
-    end
-
-    private
-
-      def prepend_header(line, options = {})
-        if options[:log_header]
-          "[#{options[:log_header]}] #{line}"
-        else
-          line
-        end
-      end
-
-      def format_arguments(args)
-        args.empty? ? '' : "(#{args.map { |arg| format_argument(arg).inspect }.join(', ')})"
-      end
-
-      def format_argument(arg)
-        if arg.is_a?(Hash) && arg.key?(:log) && arg[:log].size > 80
-          arg = arg.dup
-          arg[:log] = "#{arg[:log][0..80]} ..."
-        end
-        arg
-      end
   end
 end

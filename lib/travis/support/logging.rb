@@ -6,8 +6,35 @@ module Travis
   module Logging
     require 'travis/support/logging/format'
 
-    def self.included(base)
-      base.extend(ClassMethods)
+    class << self
+      def included(base)
+        base.extend(ClassMethods)
+      end
+
+      def wrap(type, name, args, options = {})
+        Travis.logger.send(type || :info, prepend_header("about to #{name}#{format_arguments(args)}", options)) unless options[:only] == :after
+        result = yield
+        Travis.logger.send(type || :debug, prepend_header("done: #{name}", options)) unless options[:only] == :before
+        result
+      end
+
+      def prepend_header(line, options = {})
+        options[:log_header] ?  "[#{options[:log_header]}] #{line}" : line
+      end
+
+      private
+
+        def format_arguments(args)
+          args.empty? ? '' : "(#{args.map { |arg| format_argument(arg).inspect }.join(', ')})"
+        end
+
+        def format_argument(arg)
+          if arg.is_a?(Hash) && arg.key?(:log) && arg[:log].size > 80
+            arg = arg.dup
+            arg[:log] = "#{arg[:log][0..80]} ..."
+          end
+          arg
+        end
     end
 
     module ClassMethods
@@ -18,7 +45,7 @@ module Travis
       def log(name, options = {})
         define_method(:"#{name}_with_log") do |*args, &block|
           options[:log_header] ||= self.log_header
-          Travis.logger.wrap(options[:as], name, options[:params].is_a?(FalseClass) ? [] : args, options) do
+          Travis::Logging.wrap(options[:as], name, options[:params].is_a?(FalseClass) ? [] : args, options) do
             send(:"#{name}_without_log", *args, &block)
           end
         end
