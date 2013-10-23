@@ -18,10 +18,11 @@ module Travis
         def compile_format(config)
           format = '"'
           format << "\#{time.strftime('#{config[:time_format]}')} " if config[:time_format]
+          format << '#{severity[0, 1]} '
           format << "app[#{ENV['TRAVIS_PROCESS_NAME']}]: "          if ENV['TRAVIS_PROCESS_NAME']
           format << 'PID=#{Process.pid} '                           if config[:process_id]
           format << 'TID=#{Thread.current.object_id} '              if config[:thread_id]
-          format << '#{severity[0, 1]} #{message}'
+          format << '#{message}'
           format << '"'
         end
     end
