@@ -71,7 +71,7 @@ module Travis
     def log_exception(exception)
       message = "#{exception.class.name}: #{exception.message}\n"
       message << exception.backtrace.join("\n") if exception.backtrace
-      logger.error(message, log_header: log_header)
+      error(message, log_header: log_header)
     rescue Exception => e
       puts '--- FATAL ---'
       puts 'an exception occured while logging an exception'
