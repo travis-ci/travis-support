@@ -3,9 +3,9 @@ require 'core_ext/module/prepend_to'
 
 module Travis
   module Async
-    autoload :Inline,   'travis/support/async/inline'
-    autoload :Sidekiq,  'travis/support/async/sidekiq'
-    autoload :Threaded, 'travis/support/async/threaded'
+    require 'travis/support/async/inline'
+    require 'travis/support/async/sidekiq'
+    require 'travis/support/async/threaded'
 
     class << self
       attr_writer :enabled
