@@ -2,7 +2,6 @@ require 'securerandom'
 require 'core_ext/securerandom'
 
 module Travis
-  require 'travis/support/amqp'
   require 'travis/support/assertions'
   require 'travis/support/async'
   require 'travis/support/chunkifier'
