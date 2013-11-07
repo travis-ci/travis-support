@@ -2,9 +2,8 @@ require 'hot_bunnies'
 
 module Travis
   module Amqp
-    autoload :Consumer,        'travis/support/amqp/hot_bunnies/consumer'
-    autoload :Publisher,       'travis/support/amqp/hot_bunnies/publisher'
-    autoload :FanoutPublisher, 'travis/support/amqp/hot_bunnies/publisher'
+    require 'travis/support/amqp/hot_bunnies/consumer'
+    require 'travis/support/amqp/hot_bunnies/publisher'
 
     class << self
       def config

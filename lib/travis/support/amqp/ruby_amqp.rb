@@ -3,8 +3,8 @@ require 'amqp/utilities/event_loop_helper'
 
 module Travis
   module Amqp
-    autoload :Consumer,  'travis/support/amqp/ruby_amqp/consumer'
-    autoload :Publisher, 'travis/support/amqp/ruby_amqp/publisher'
+    require 'travis/support/amqp/ruby_amqp/consumer'
+    require 'travis/support/amqp/ruby_amqp/publisher'
 
     class << self
       def config

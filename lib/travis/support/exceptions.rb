@@ -1,7 +1,7 @@
 module Travis
   module Exceptions
-    autoload :Handling, 'travis/support/exceptions/handling'
-    autoload :Reporter, 'travis/support/exceptions/reporter'
+    require 'travis/support/exceptions/handling'
+    require 'travis/support/exceptions/reporter'
 
     class << self
       def handle(exception)

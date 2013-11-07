@@ -1,4 +1,6 @@
 require 'hashr'
+require 'travis/support/logging'
+require 'travis/support/logging/format'
 
 module Travis
   module Amqp

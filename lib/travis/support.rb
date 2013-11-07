@@ -2,19 +2,20 @@ require 'securerandom'
 require 'core_ext/securerandom'
 
 module Travis
-  autoload :Amqp,            'travis/support/amqp'
-  autoload :Assertions,      'travis/support/assertions'
-  autoload :Async,           'travis/support/async'
-  autoload :Chunkifier,      'travis/support/chunkifier'
-  autoload :Database,        'travis/support/database'
-  autoload :Exceptions,      'travis/support/exceptions'
-  autoload :Helpers,         'travis/support/helpers'
-  autoload :Instrumentation, 'travis/support/instrumentation'
-  autoload :LogSubscriber,   'travis/support/log_subscriber'
-  autoload :Logging,         'travis/support/logging'
-  autoload :Memory,          'travis/support/memory'
-  autoload :NewRelic,        'travis/support/new_relic'
-  autoload :Retryable,       'travis/support/retryable'
+  require 'travis/support/assertions'
+  require 'travis/support/async'
+  require 'travis/support/chunkifier'
+  require 'travis/support/database'
+  require 'travis/support/exceptions'
+  require 'travis/support/helpers'
+  require 'travis/support/instrumentation'
+  require 'travis/support/log_subscriber'
+  require 'travis/support/logging'
+  if RUBY_PLATFORM == 'java'
+    require 'travis/support/memory'
+  end
+  require 'travis/support/new_relic'
+  require 'travis/support/retryable'
 
   class << self
     def env

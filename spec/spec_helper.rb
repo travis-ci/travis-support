@@ -6,6 +6,7 @@ require 'mocha'
 require 'logger'
 require 'stringio'
 require 'travis/support'
+require 'travis/support/amqp'
 
 RSpec.configure do |config|
   config.mock_with :mocha

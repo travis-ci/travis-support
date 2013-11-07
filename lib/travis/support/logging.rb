@@ -4,8 +4,7 @@ require 'logger'
 
 module Travis
   module Logging
-    autoload :Format, 'travis/support/logging/format'
-    autoload :FormatWithoutTimestamp, 'travis/support/logging/format'
+    require 'travis/support/logging/format'
 
     ANSI = {
       :red    => 31,
