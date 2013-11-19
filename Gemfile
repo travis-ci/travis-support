@@ -28,6 +28,8 @@ group :test do
   gem 'mocha',         '~> 0.11.0'
   gem 'rspec'
   gem 'simplecov',     '>= 0.4.0', :require => false
+  gem 'guard'
+  gem 'guard-rspec'
 end
 
 
