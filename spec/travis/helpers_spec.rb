@@ -37,5 +37,9 @@ describe Travis::Helpers do
       expected = 'FOO=[secure] BAR=[secure]'
       Travis::Helpers.obfuscate_env_vars('FOO="" BAR=d').should == expected
     end
+
+    it "doesn't fail on lines that are hashes" do
+      Travis::Helpers.obfuscate_env_vars("SOMEKEY=value" => nil).should == '[One of the secure variables in your .travis.yml has an invalid format.]'
+    end
   end
 end
