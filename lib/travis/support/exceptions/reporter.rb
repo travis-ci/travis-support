@@ -11,8 +11,8 @@ module Travis
           Reporter.new.run
         end
 
-        def enqueue(error)
-          queue.push(error)
+        def enqueue(error, options = {})
+          queue.push([error, options])
         end
 
         def adapter
@@ -37,12 +37,12 @@ module Travis
       end
 
       def pop
-        handle(queue.pop)
+        handle(*queue.pop)
       rescue => e
       end
 
-      def handle(error)
-        adapter.handle(error, extra: metadata_for(error))
+      def handle(error, options = {})
+        adapter.handle(error, { extra: metadata_for(error) }, options)
       rescue Exception => e
         puts '---- FAILSAFE ----'
         puts "Error while handling exception: #{e.message}"

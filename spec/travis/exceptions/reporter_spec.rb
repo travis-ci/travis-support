@@ -33,13 +33,13 @@ describe Travis::Exceptions::Reporter do
 
   it "should allow pushing an error on the queue" do
     Travis::Exceptions::Reporter.enqueue(error)
-    reporter.queue.pop.should == error
+    reporter.queue.pop.should == [error, {}]
   end
 
   it "should add custom metadata to raven" do
     error.stubs(:metadata).returns('metadata' => 'metadata')
     metadata = reporter.metadata_for(error)
-    reporter.adapter.expects(:handle).with(error, extra: metadata)
+    reporter.adapter.expects(:handle).with(error, { extra: metadata }, {})
     reporter.handle(error)
   end
 

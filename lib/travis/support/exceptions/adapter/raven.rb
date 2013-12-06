@@ -17,7 +17,7 @@ module Travis
           end
         end
 
-        def handle(error, metadata = {})
+        def handle(error, metadata = {}, options = {})
           logger.error(message_for(error))
           ::Raven.capture_exception(error, metadata)
         end

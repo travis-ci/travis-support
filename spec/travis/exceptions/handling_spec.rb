@@ -43,7 +43,7 @@ describe Travis::Exceptions::Handling do
   it 'sends exceptions to the exception handler' do
     exception = Exception.new
     object.stubs(:inner).raises(exception)
-    Travis::Exceptions.expects(:handle).with(exception)
+    Travis::Exceptions.expects(:handle).with(exception, {})
     object.outer
   end
 

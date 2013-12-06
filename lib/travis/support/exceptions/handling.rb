@@ -1,3 +1,4 @@
+require 'core_ext/hash/slice'
 require 'core_ext/module/prepend_to'
 
 module Travis
@@ -8,7 +9,7 @@ module Travis
           begin
             method.call(*args, &block)
           rescue options[:from] || Exception => e
-            Exceptions.handle(e)
+            Exceptions.handle(e, options.slice(:backtrace))
           end
         end unless Travis.env == 'test'
       end
