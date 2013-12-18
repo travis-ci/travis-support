@@ -4,8 +4,6 @@ require 'logger'
 
 module Travis
   module Logging
-    require 'travis/support/logging/format'
-
     class << self
       def included(base)
         base.extend(ClassMethods)
