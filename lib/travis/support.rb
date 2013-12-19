@@ -5,7 +5,6 @@ module Travis
   require 'travis/support/assertions'
   require 'travis/support/async'
   require 'travis/support/chunkifier'
-  require 'travis/support/database'
   require 'travis/support/exceptions'
   require 'travis/support/helpers'
   require 'travis/support/instrumentation'
