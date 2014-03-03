@@ -25,7 +25,7 @@ describe Travis::Assertions do
 
     it 'does not raise an exception when the returned value is true' do
       @return_value = true
-      should_not raise_error(Travis::AssertionFailed)
+      should_not raise_error
     end
 
     it 'raises an exception when the returned value is false' do
@@ -39,7 +39,7 @@ describe Travis::Assertions do
 
     it 'does not raise an exception when the returned value is true' do
       @return_value = true
-      should_not raise_error(Travis::AssertionFailed)
+      should_not raise_error
     end
 
     it 'raises an exception when the returned value is false' do
