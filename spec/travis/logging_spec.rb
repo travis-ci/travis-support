@@ -78,4 +78,21 @@ describe Travis::Logging do
       io.string.should include("line 2")
     end
   end
+
+  describe 'error' do
+    context 'with exception' do
+      let(:exception) { StandardError.new('kaputt!').tap { |e| e.set_backtrace(['line 1', 'line 2']) } }
+
+      it 'logs the exception message' do
+        object.error(exception)
+        io.string.should include('kaputt!')
+      end
+
+      it 'logs the backtrace' do
+        object.error(exception)
+        io.string.should include("line 1")
+        io.string.should include("line 2")
+      end
+    end
+  end
 end

@@ -64,7 +64,17 @@ module Travis
 
     [:fatal, :error, :warn, :info, :debug].each do |level|
       define_method(level) do |*args|
-        message, options = *args
+        if args.first.is_a?(Exception)
+          exception, options = *args
+
+          message = "#{exception.class.name}: #{exception.message}"
+          if exception.backtrace
+            message << "\n#{exception.backtrace.join("\n")}"
+          end
+        else
+          message, options = *args
+        end
+
         message.chomp.split("\n").each do |line|
           logger.send(level, Logging::Format.wrap(self, line, options || {}))
         end
