@@ -1,6 +1,6 @@
 require 'active_support/notifications'
 require 'active_support/core_ext/string/inflections'
-require 'active_support/core_ext/logger'
+# require 'active_support/core_ext/logger' # gone in active_support?
 require 'securerandom' # wat
 
 module Travis
