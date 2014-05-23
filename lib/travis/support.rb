@@ -30,7 +30,7 @@ module Travis
       @logger = Logging.configure(logger)
     end
 
-    def uuid= (uuid)
+    def uuid=(uuid)
       Thread.current[:uuid] = uuid
     end
 
