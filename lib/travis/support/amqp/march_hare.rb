@@ -1,9 +1,9 @@
-require 'hot_bunnies'
+require 'march_hare'
 
 module Travis
   module Amqp
-    require 'travis/support/amqp/hot_bunnies/consumer'
-    require 'travis/support/amqp/hot_bunnies/publisher'
+    require 'travis/support/amqp/march_hare/consumer'
+    require 'travis/support/amqp/march_hare/publisher'
 
     class << self
       def config
@@ -19,7 +19,7 @@ module Travis
       end
 
       def connection
-        @connection ||= HotBunnies.connect(config)
+        @connection ||= MarchHare.connect(config)
       end
       alias :connect :connection
 
