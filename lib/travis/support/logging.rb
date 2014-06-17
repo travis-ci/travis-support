@@ -5,6 +5,12 @@ require 'logger'
 module Travis
   module Logging
     class << self
+      def configure(*args, &block)
+        require 'travis/support/logger'
+        puts '[Deprecation] Travis::Logging.configure is deprecated. Use Travis::Logger.configure instead.'
+        Logger.configure(*args, &block)
+      end
+
       def included(base)
         base.extend(ClassMethods)
       end
