@@ -9,7 +9,6 @@ gem 'gem-patching'
 
 gem 'metriks',         :git => 'https://github.com/roidrage/metriks.git', :ref => 'source'
 gem 'sentry-raven',    :github => 'getsentry/raven-ruby'
-gem 'newrelic_rpm',    '~> 3.3.2'
 
 platform :mri do
   gem 'amq-client',    '>= 0.9.0'

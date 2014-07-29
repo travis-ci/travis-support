@@ -14,7 +14,6 @@ module Travis
   if RUBY_PLATFORM == 'java'
     require 'travis/support/memory'
   end
-  require 'travis/support/new_relic'
   require 'travis/support/retryable'
 
   class << self
