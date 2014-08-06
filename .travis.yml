@@ -13,6 +13,8 @@ services:
 
 sudo: false
 
+cache: bundler
+
 matrix:
   exclude:
     - rvm: 1.9.3
