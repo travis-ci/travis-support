@@ -1,12 +1,18 @@
 language: ruby
+
 rvm:
   - 1.9.3
   - jruby-19mode
+
 jdk:
   - openjdk6
   - openjdk7
+
 services:
   - rabbitmq
+
+sudo: false
+
 matrix:
   exclude:
     - rvm: 1.9.3
