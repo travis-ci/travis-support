@@ -1,5 +1,6 @@
 require 'spec_helper'
 require 'active_support/core_ext/hash/except'
+require 'metriks'
 
 describe Travis::Instrumentation do
   let(:klass) do
@@ -30,17 +31,14 @@ describe Travis::Instrumentation do
   let(:events) { [] }
 
   before :each do
-    @subscriber = ActiveSupport::Notifications.subscribe /travis.foo.bar.baz/ do |key, args|
+    @subscriber = ActiveSupport::Notifications.subscribe /travis\./ do |key, args|
       events << [key, args]
     end
   end
 
   after :each do
+    klass.instrumentation_key = nil
     ActiveSupport::Notifications.unsubscribe(@subscriber)
-  end
-
-  before :each do
-    Metriks.stubs(:timer).returns(timer)
   end
 
   describe 'instruments the method' do
@@ -77,9 +75,38 @@ describe Travis::Instrumentation do
     end
   end
 
+  describe 'inheriting classes' do
+    let(:child)  { Class.new(klass) { def self.name; 'Travis::Something'; end } }
+    let(:object) { child.new }
+
+    it "use the child class name as the instrumentation key by default" do
+      object.tracked('foo')
+      key, args = events.first
+      key.should == 'travis.something.baz.tracked:received'
+    end
+
+    it "can overwrite the instrumentation key" do
+      child.instrumentation_key = 'travis.something.else'
+      object.tracked('foo')
+      key, args = events.first
+      key.should == 'travis.something.else.baz.tracked:received'
+    end
+  end
+
+  describe 'instrumentation_key' do
+    it 'holds separate values on different classes' do
+      one = Class.new(klass) { def self.name; 'Travis::One'; end }
+      two = Class.new(klass) { def self.name; 'Travis::Two'; end }
+      one.instrumentation_key = 'travis.one.foo'
+      two.instrumentation_key = 'travis.two.bar'
+      one.instrumentation_key.should == 'travis.one.foo'
+      two.instrumentation_key.should == 'travis.two.bar'
+    end
+  end
+
   describe 'calling the method' do
     it 'meters execution of the method' do
-      Metriks.expects(:timer).with('v1.travis.foo.bar.baz.tracked:completed').returns(timer)
+      Travis::Metrics.expects(:meter).with('travis.foo.bar.baz.tracked:completed', anything)
       object.tracked
     end
 
@@ -103,13 +130,13 @@ describe Travis::Instrumentation do
     end
 
     it 'meters that the method call is completed' do
-      Metriks.expects(:timer).with('v1.travis.foo.bar.baz.tracked:completed').returns(timer)
+      Travis::Metrics.expects(:meter).with('travis.foo.bar.baz.tracked:completed', anything)
       object.tracked
     end
 
     it 'meters that the method call has failed' do
       object.stubs(:inner).raises(StandardError)
-      Metriks.expects(:meter).with('v1.travis.foo.bar.baz.tracked:failed').returns(meter)
+      Travis::Metrics.expects(:meter).with('travis.foo.bar.baz.tracked:failed', anything)
       object.tracked rescue nil
     end
   end

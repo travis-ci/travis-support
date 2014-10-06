@@ -11,17 +11,15 @@ module Travis
           Reporter.new.run
         end
 
-        def enqueue(error)
-          queue.push(error)
+        def enqueue(error, options = {})
+          queue.push([error, options])
         end
 
-        def enabled?
-          @enabled ||= begin
-            require 'raven'
-            !!Travis.config.sentry.dsn
-          rescue LoadError => e
-            false
-          end
+        def adapter
+          Travis.config.sentry.dsn ? Adapter::Raven : Adapter::Logger
+        rescue LoadError => e
+          Travis.logger.error 'Could not load raven, falling back to logger for exception reporting'
+          Adapter::Logger.new
         end
       end
 
@@ -31,14 +29,6 @@ module Travis
       attr_accessor :thread
 
       def run
-        if enabled?
-          ::Raven.configure do |config|
-            config.dsn = Travis.config.sentry.dsn
-            config.ssl = Travis.config.ssl if Travis.config.ssl
-            config.logger = Travis.logger  if Travis.logger
-            config.current_environment = Travis.env
-          end
-        end
         @thread = Thread.new &method(:error_loop)
       end
 
@@ -47,14 +37,12 @@ module Travis
       end
 
       def pop
-        handle(queue.pop)
+        handle(*queue.pop)
       rescue => e
       end
 
-      def handle(error)
-        Travis.logger.error(message_for(error))
-        options = { extra: metadata_for(error) }
-        Raven.capture_exception(error, options) if enabled?
+      def handle(error, options = {})
+        adapter.handle(error, { extra: metadata_for(error) }, options)
       rescue Exception => e
         puts '---- FAILSAFE ----'
         puts "Error while handling exception: #{e.message}"
@@ -62,22 +50,12 @@ module Travis
         puts '------------------'
       end
 
-      def message_for(error)
-        lines = ["Error: #{error.message}"]
-        lines += error.backtrace ? error.backtrace : [] if Travis.logger.level == Logger::DEBUG
-        lines.join("\n")
+      def adapter
+        @adapter ||= self.class.adapter.new(Travis.config, Travis.logger, env: Travis.env)
       end
 
       def metadata_for(error)
-        metadata = { }
-        metadata.merge!(error.metadata) if error.respond_to?(:metadata)
-        metadata
-      end
-
-      private
-
-      def enabled?
-        self.class.enabled?
+        error.respond_to?(:metadata) ? error.metadata : {}
       end
     end
   end

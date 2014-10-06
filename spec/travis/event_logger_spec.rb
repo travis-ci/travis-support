@@ -47,7 +47,7 @@ describe Travis::EventLogger do
     it 'allows passing in a block for instrumentation' do
       Travis::EventLogger.notify('foo', 'bar') { }
       args.count.should be == 5
-      data[:instrumented].should be_true
+      data[:instrumented].should == true
     end
 
     it 'returns the block value' do
@@ -90,7 +90,7 @@ describe Travis::EventLogger do
 
     it 'hands on the event for instrumentation' do
       Travis::EventLogger.notify('foo', 'bar') { }
-      payload[:instrumented].should be_true
+      payload[:instrumented].should == true
       payload[:event].should respond_to(:duration)
     end
   end

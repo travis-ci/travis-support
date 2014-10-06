@@ -21,13 +21,29 @@ module Travis
       def publish(data, options = {})
         data = MultiJson.encode(data)
         defaults = { :routing_key => routing_key, :properties => { :message_id => rand(100000000000).to_s } }
-        exchange.publish(data, deep_merge(defaults, options))
+        retrying do
+          exchange.publish(data, deep_merge(defaults, options))
+        end
       end
 
       protected
 
         def exchange
           @exchange ||= self.class.channel.exchange(name, :durable => true, :auto_delete => false, :type => type)
+        end
+
+        def retrying(&block)
+          retries ||= 0
+          block.call
+        rescue Exception, java.lang.Throwable => e
+          Travis.logger.error("Exception while trying to publish an AMQP message:\n#{e.message}")
+          retries += 1
+          if retries < 5
+            sleep 1
+            retry
+          else
+            raise e
+          end
         end
 
         def deep_merge(hash, other)

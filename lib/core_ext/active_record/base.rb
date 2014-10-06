@@ -26,7 +26,7 @@ class ActiveRecord::Base
 
     # TODO extract this to somewhere else and use Travis.config.env instead
     def adapter
-      env = defined?(Rails) ? Rails.env : ENV['ENV'] || ENV['RAILS_ENV'] || 'test'
+      env = defined?(Rails) && Rails.respond_to?(:env) ? Rails.env : ENV['ENV'] || ENV['RAILS_ENV'] || 'test'
       adapter = configurations[env]['adapter']
       adapter == 'jdbcpostgresql' ? 'postgresql' : adapter
     end

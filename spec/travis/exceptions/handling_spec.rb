@@ -32,7 +32,7 @@ describe Travis::Exceptions::Handling do
 
   it 'calls the original implementation' do
     object.outer
-    object.called.should be_true
+    object.called.should == true
   end
 
   it 'rescues exceptions' do
@@ -43,7 +43,7 @@ describe Travis::Exceptions::Handling do
   it 'sends exceptions to the exception handler' do
     exception = Exception.new
     object.stubs(:inner).raises(exception)
-    Travis::Exceptions.expects(:handle).with(exception)
+    Travis::Exceptions.expects(:handle).with(exception, {})
     object.outer
   end
 
