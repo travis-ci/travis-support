@@ -8,7 +8,8 @@ module Travis
           require 'metriks/librato_metrics_reporter'
           return unless config = Travis.config.librato
           puts 'Starting Librato Metriks reporter'
-          source = ENV.key?('DYNO') ? "#{config.source}.#{ENV['DYNO']}" : config.source
+          source = Travis.config.librato_source
+          source = "#{source}.#{ENV['DYNO']}" if ENV.key?('DYNO')
           Metriks::LibratoMetricsReporter.new(config.email, config.token, source: source)
         end
 
