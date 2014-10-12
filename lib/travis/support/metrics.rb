@@ -4,7 +4,7 @@ module Travis
   module Metrics
     module Reporter
       class << self
-        def logger
+        def librato
           require 'metriks/librato_metrics_reporter'
           return unless config = Travis.config.librato
           puts 'Starting Librato Metriks reporter'
