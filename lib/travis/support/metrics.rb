@@ -29,7 +29,7 @@ module Travis
       attr_reader :reporter
 
       def setup(adapter = nil)
-        if adapter ||= Travis.config.metrics.reporter
+        if adapter ||= Travis.config.metrics.try(:reporter)
           Travis.logger.info("Starting metriks reporter #{adapter}.")
           @reporter = Reporter.send(adapter)
         end
