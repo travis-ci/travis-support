@@ -47,7 +47,7 @@ module Travis
 
         def channel
           Amqp.connection.create_channel.tap do |channel|
-            channel.prefetch = 1
+            channel.prefetch = options[:channel][:prefetch]
           end
         end
 
