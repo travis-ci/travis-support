@@ -25,7 +25,7 @@ end
 group :test do
   gem 'rake',          '~> 0.9.2'
   gem 'mocha',         '~> 0.11.0'
-  gem 'rspec',         '~> 2.14'
+  gem 'rspec',         '~> 2.99.beta1'
   gem 'rspec-its'
   gem 'simplecov',     '>= 0.4.0', :require => false
   gem 'guard'
