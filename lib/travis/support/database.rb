@@ -1,5 +1,8 @@
-require 'active_record'
-require 'erb'
+begin
+  require 'active_record'
+  require 'erb'
+rescue LoadError
+end
 
 # Encapsulates setting up ActiveRecord and connecting to the database as
 # required for travis-hub, which is a non-rails app.
