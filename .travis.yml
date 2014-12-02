@@ -3,6 +3,7 @@ language: ruby
 rvm:
   - 1.9.3
   - jruby-19mode
+  - jruby-head
 
 jdk:
   - openjdk6
@@ -21,3 +22,5 @@ matrix:
       jdk: openjdk7
     - rvm: 1.9.3
       jdk: oraclejdk7
+  allow_failures:
+    - rvm: jruby-head
