@@ -11,8 +11,9 @@ Travis::Amqp::Consumer.class_eval do
       new(Travis::Worker.config.queue)
     end
 
-    def jobs(routing_key)
-      new("reporting.jobs.#{routing_key}", :exchange => { :name => 'reporting' })
+    def jobs(routing_key, options = {})
+      options = { exchange: { name: 'reporting' } }.deep_merge(options)
+      new("reporting.jobs.#{routing_key}", options)
     end
 
     def commands
