@@ -4,14 +4,42 @@ require 'logger'
 
 module Travis
   module Logging
-    require 'travis/support/logging/format'
+    class << self
+      def configure(*args, &block)
+        require 'travis/support/logger'
+        puts '[Deprecation] Travis::Logging.configure is deprecated. Use Travis::Logger.configure instead.'
+        Logger.configure(*args, &block)
+      end
 
-    ANSI = {
-      :red    => 31,
-      :green  => 32,
-      :yellow => 33,
-      :cyan   => 36
-    }
+      def included(base)
+        base.extend(ClassMethods)
+      end
+
+      def wrap(type, name, args, options = {})
+        Travis.logger.send(type || :info, prepend_header("about to #{name}#{format_arguments(args)}", options)) unless options[:only] == :after
+        result = yield
+        Travis.logger.send(type || :debug, prepend_header("done: #{name}", options)) unless options[:only] == :before
+        result
+      end
+
+      def prepend_header(line, options = {})
+        options[:log_header] ?  "[#{options[:log_header]}] #{line}" : line
+      end
+
+      private
+
+        def format_arguments(args)
+          args.empty? ? '' : "(#{args.map { |arg| format_argument(arg).inspect }.join(', ')})"
+        end
+
+        def format_argument(arg)
+          if arg.is_a?(Hash) && arg.key?(:log) && arg[:log].size > 80
+            arg = arg.dup
+            arg[:log] = "#{arg[:log][0..80]} ..."
+          end
+          arg
+        end
+    end
 
     module ClassMethods
       def log_header(&block)
@@ -20,43 +48,12 @@ module Travis
 
       def log(name, options = {})
         define_method(:"#{name}_with_log") do |*args, &block|
-          arguments = options[:params].is_a?(FalseClass) ? [] : args
-          Logging.before(options[:as], self, name, arguments) unless options[:only] == :after
-          send(:"#{name}_without_log", *args, &block).tap do |result|
-            Logging.after(options[:as], self, name) unless options[:only] == :before
+          options[:log_header] ||= self.log_header
+          Travis::Logging.wrap(options[:as], name, options[:params].is_a?(FalseClass) ? [] : args, options) do
+            send(:"#{name}_without_log", *args, &block)
           end
         end
         alias_method_chain name, 'log'
-      end
-    end
-
-    class << self
-      def included(base)
-        base.extend(ClassMethods)
-      end
-
-      delegate :logger, :to => Travis
-
-      def configure(logger)
-        logger.tap do
-          logger.formatter = proc { |*args| FormatWithoutTimestamp.format(*args) }
-          logger.level = Logger.const_get(log_level.to_s.upcase)
-        end
-      end
-
-      def before(type, *args)
-        logger.send(type || :info, Format.before(*args))
-      end
-
-      def after(type, *args)
-        logger.send(type || :debug, Format.after(*args))
-      end
-
-      def log_level
-        case
-        when defined?(Travis::Worker) then Travis::Worker.config.log_level
-        when defined?(Travis.config)  then Travis.config.log_level
-        end || :debug
       end
     end
 
@@ -64,35 +61,26 @@ module Travis
 
     [:fatal, :error, :warn, :info, :debug].each do |level|
       define_method(level) do |*args|
-        if args.first.is_a?(Exception)
-          exception, options = *args
-
-          message = "#{exception.class.name}: #{exception.message}"
-          if exception.backtrace
-            message << "\n#{exception.backtrace.join("\n")}"
-          end
+        message, options = *args
+        if logger.method(level).arity == -2
+          options ||= {}
+          options[:log_header] ||= self.log_header
+          logger.send(level, message, options)
         else
-          message, options = *args
-        end
-
-        message.chomp.split("\n").each do |line|
-          logger.send(level, Logging::Format.wrap(self, line, options || {}))
+          logger.send(level, message)
         end
       end
     end
 
     def log_exception(exception)
-      logger.error(Logging::Format.wrap(self, "#{exception.class.name}: #{exception.message}"))
-      exception.backtrace.each { |line| logger.error(Logging::Format.wrap(self, line)) } if exception.backtrace
+      message = "#{exception.class.name}: #{exception.message}\n"
+      message << exception.backtrace.join("\n") if exception.backtrace
+      error(message, log_header: log_header)
     rescue Exception => e
       puts '--- FATAL ---'
       puts 'an exception occured while logging an exception'
       puts e.message, e.backtrace
       puts exception.message, exception.backtrace
-    end
-
-    def colorize(color, text)
-      "\e[#{ANSI[color]}m#{text}\e[0m"
     end
 
     def log_header

@@ -12,7 +12,7 @@ describe 'Hash#deep_merge' do
     lft = { :foo => { :bar => 'bar' } }
     rgt = { :foo => { :baz => 'baz' } }
     lft.deep_merge(rgt)
-    lft.key?(:baz).should be_false
+    lft.key?(:baz).should == false
   end
 end
 

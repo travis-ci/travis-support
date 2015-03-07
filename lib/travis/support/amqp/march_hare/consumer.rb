@@ -1,6 +1,5 @@
 require 'hashr'
 require 'travis/support/logging'
-require 'travis/support/logging/format'
 
 module Travis
   module Amqp
@@ -48,7 +47,7 @@ module Travis
 
         def channel
           Amqp.connection.create_channel.tap do |channel|
-            channel.prefetch = 1
+            channel.prefetch = options[:channel][:prefetch] || DEFAULTS[:channel][:prefetch]
           end
         end
 

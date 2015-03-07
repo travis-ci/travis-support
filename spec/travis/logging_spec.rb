@@ -2,6 +2,7 @@ require 'spec_helper'
 require 'travis/support'
 require 'stringio'
 require 'logger'
+require 'hashr'
 
 describe Travis::Logging do
   class Foo
@@ -15,26 +16,33 @@ describe Travis::Logging do
   end
 
   let(:io)     { StringIO.new }
+  let(:log)    { io.string }
   let(:object) { Foo.new }
 
   before :each do
-    Travis.logger = Logger.new(io)
+    Travis.stubs(:config).returns(Hashr.new(log_level: :debug, logger: { process_id: true, thread_id: true }))
+    Travis.logger = Travis::Logger.new(io)
   end
 
-  describe '.log' do
+  describe 'log' do
     it 'logs before the method call' do
       object.do_something(:foo, :bar)
-      io.string.should include('about to do_something')
+      log.should include('about to do_something')
     end
 
     it 'logs after the method call' do
       object.do_something(:foo, :bar)
-      io.string.should include('done: do_something')
+      log.should include('done: do_something')
     end
 
     it 'includes the log header' do
       object.do_something(:foo, :bar)
-      io.string.should include('header')
+      log.should include('header')
+    end
+
+    it 'includes the process id' do
+      object.do_something(:foo, :bar)
+      expect(io.string).to match(/PID=\w+/)
     end
 
     it 'includes the thread id' do
@@ -43,56 +51,18 @@ describe Travis::Logging do
     end
   end
 
-  describe '.log_level' do
-    after :each do
-      Travis.send(:remove_const, :Worker) if defined?(Travis::Worker)
-    end
-
-    it 'returns Travis::Worker.config.log_level if defined' do
-      Travis.const_set(:Worker, Module.new)
-      Travis::Worker.stubs(:config).returns(stub(:log_level => :info))
-      Travis::Logging.log_level.should == :info
-    end
-
-    it 'returns Travis.config.log_level if defined' do
-      Travis.stubs(:config).returns(stub(:log_level => :info))
-      Travis::Logging.log_level.should == :info
-    end
-
-    it 'returns :debug by default' do
-      Travis::Logging.log_level.should == :debug
-    end
-  end
-
   describe 'log_exception' do
     let(:exception) { Exception.new('kaputt!').tap { |e| e.set_backtrace(['line 1', 'line 2']) } }
 
     it 'logs the exception message' do
       object.log_exception(exception)
-      io.string.should include('kaputt!')
+      log.should include('kaputt!')
     end
 
     it 'logs the backtrace' do
       object.log_exception(exception)
-      io.string.should include("line 1")
-      io.string.should include("line 2")
-    end
-  end
-
-  describe 'error' do
-    context 'with exception' do
-      let(:exception) { StandardError.new('kaputt!').tap { |e| e.set_backtrace(['line 1', 'line 2']) } }
-
-      it 'logs the exception message' do
-        object.error(exception)
-        io.string.should include('kaputt!')
-      end
-
-      it 'logs the backtrace' do
-        object.error(exception)
-        io.string.should include("line 1")
-        io.string.should include("line 2")
-      end
+      log.should include("line 1")
+      log.should include("line 2")
     end
   end
 end

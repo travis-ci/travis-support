@@ -9,7 +9,6 @@ gem 'gem-patching'
 
 gem 'metriks',         :git => 'https://github.com/roidrage/metriks.git', :ref => 'source'
 gem 'sentry-raven',    :github => 'getsentry/raven-ruby'
-gem 'newrelic_rpm',    '~> 3.3.2'
 
 platform :mri do
   gem 'amq-client',    '>= 0.9.0'
@@ -26,7 +25,8 @@ end
 group :test do
   gem 'rake',          '~> 0.9.2'
   gem 'mocha',         '~> 0.11.0'
-  gem 'rspec'
+  gem 'rspec',         '~> 2.14'
+  gem 'rspec-its',     '~> 1.0.1'
   gem 'simplecov',     '>= 0.4.0', :require => false
   gem 'guard'
   gem 'guard-rspec'

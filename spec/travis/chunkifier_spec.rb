@@ -36,7 +36,7 @@ module Travis
       let(:content) { "01\nąąąą" * 1000 }
 
       it 'should keep parts under chunk_size taking into account conversion to json and bytes' do
-        subject.parts.all? { |p| p.to_json.bytesize <= 100 }.should be_true
+        subject.parts.all? { |p| p.to_json.bytesize <= 100 }.should == true
       end
     end
 
