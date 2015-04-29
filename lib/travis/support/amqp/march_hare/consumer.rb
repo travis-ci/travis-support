@@ -34,6 +34,13 @@ module Travis
         subscription.cancel if subscription.try(:active?)
       end
 
+      def channel
+        @channel ||= Amqp.connection.create_channel.tap do |channel|
+          channel.prefetch = options[:channel][:prefetch] || DEFAULTS[:channel][:prefetch]
+        end
+      end
+
+
       protected
 
         def queue
@@ -42,12 +49,6 @@ module Travis
               routing_key = options.exchange.routing_key || name
               queue.bind(options.exchange.name, :routing_key => routing_key)
             end
-          end
-        end
-
-        def channel
-          Amqp.connection.create_channel.tap do |channel|
-            channel.prefetch = options[:channel][:prefetch] || DEFAULTS[:channel][:prefetch]
           end
         end
 

@@ -40,8 +40,9 @@ Travis::Amqp::Publisher.class_eval do
       new(routing_key)
     end
 
-    def jobs(routing_key)
-      new("reporting.jobs.#{routing_key}", :type => 'topic', :name => 'reporting')
+    def jobs(routing_key, options = {})
+      options = { :type => 'topic', :name => 'reporting' }.update(options)
+      new("reporting.jobs.#{routing_key}", options)
     end
 
     def commands
