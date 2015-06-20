@@ -23,7 +23,7 @@ module Travis
           format << 'PID=#{Process.pid} '                           if config[:process_id]
           format << 'TID=#{Thread.current.object_id} '              if config[:thread_id]
           format << '#{message}'
-          format << '"'
+          format << '\n"'
         end
     end
   end
