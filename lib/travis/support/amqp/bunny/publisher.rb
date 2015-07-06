@@ -4,6 +4,12 @@ require 'metriks'
 module Travis
   module Amqp
     class Publisher
+      class << self
+        def channel
+          @channel ||= Amqp.connection.create_channel
+        end
+      end
+
       attr_reader :name, :type, :routing_key, :options
 
       def initialize(routing_key, options = {})
@@ -30,7 +36,7 @@ module Travis
         end
 
         def exchange
-          @exchange ||= Amqp.connection.exchange(name, :type => type.to_sym, :durable => true, :auto_delete => false)
+          @exchange ||= self.class.channel.exchange(name, :type => type.to_sym, :durable => true, :auto_delete => false)
         end
 
         def deep_merge(hash, other)
