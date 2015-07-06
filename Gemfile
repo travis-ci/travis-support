@@ -4,7 +4,7 @@ gem 'activerecord',    '~> 3.2.12'
 gem 'activesupport',   '~> 3.2.12'
 gem 'hashr',           '~> 0.0.20'
 gem 'multi_json'
-gem 'json',            '~> 1.8.3'
+gem 'json'
 gem 'gem-patching'
 
 gem 'metriks',         :git => 'https://github.com/roidrage/metriks.git', :ref => 'source'
