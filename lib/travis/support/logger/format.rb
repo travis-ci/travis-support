@@ -21,7 +21,7 @@ module Travis
           format << '#{severity[0, 1]} '
           format << "app[#{ENV['TRAVIS_PROCESS_NAME']}]: "          if ENV['TRAVIS_PROCESS_NAME']
           format << 'PID=#{Process.pid} '                           if config[:process_id]
-          format << 'TID=#{Thread.current.object_id} '              if config[:thread_id]
+          format << 'TID=#{Thread.current.object_id.to_s[-4, 4]} '  if config[:thread_id]
           format << '#{message}'
           format << '"'
         end
