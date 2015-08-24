@@ -1,14 +1,22 @@
 require 'active_support/notifications'
 require 'active_support/core_ext/string/inflections'
-# require 'active_support/core_ext/logger' # gone in active_support?
 require 'securerandom' # wat
 require 'travis/support/metrics'
+require 'travis/support/instrumentation/instrument'
+require 'travis/support/instrumentation/publisher/log'
 
 module Travis
   module Instrumentation
     class << self
-      def setup
-        Travis.logger.info "[deprecated] Travis::Instrumentation.setup now does nothing. Call Travis::Metrics.setup instead."
+      attr_reader :publishers
+
+      def setup(logger)
+        @publishers = []
+        publishers << Publisher::Log.new(logger)
+      end
+
+      def publish(event)
+        publishers && publishers.each { |publisher| publisher.publish(event) }
       end
 
       def meter(event, options = {})
