@@ -6,13 +6,17 @@ module Travis
     module Handling
       def rescues(name, options = {})
         prepend_to(name) do |object, method, *args, &block|
-          begin
+          if Travis.env == 'test'
             method.call(*args, &block)
-          rescue options[:from] || Exception => e
-            Exceptions.handle(e, options.slice(:backtrace))
-            raise if options[:raise] && Array(options[:raise]).include?(e.class)
+          else
+            begin
+              method.call(*args, &block)
+            rescue options[:from] || Exception => e
+              Exceptions.handle(e, options.slice(:backtrace))
+              raise if options[:raise] && Array(options[:raise]).include?(e.class)
+            end
           end
-        end unless Travis.env == 'test'
+        end
       end
     end
   end
