@@ -18,7 +18,7 @@ module Travis
           'logs_database' => Travis.config.logs_database || Travis.config.database
         }
 
-        ActiveRecord::Base.establish_connection(Travis.env)
+        ActiveRecord::Base.establish_connection(Travis.env.to_sym)
       end
     end
   end
