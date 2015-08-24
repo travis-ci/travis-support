@@ -3,6 +3,8 @@ require 'core_ext/module/include'
 
 describe Travis::Exceptions::Handling do
   let(:klass) do
+    options = self.options
+
     Class.new do
       extend Travis::Exceptions::Handling
 
@@ -11,7 +13,7 @@ describe Travis::Exceptions::Handling do
       def outer
         inner
       end
-      rescues :outer
+      rescues :outer, options
 
       def inner # so there's something we can stub for raising
         @called = true
@@ -24,10 +26,11 @@ describe Travis::Exceptions::Handling do
     end
   end
 
-  let(:object) { klass.new }
+  let(:options) { {} }
+  let(:object)  { klass.new }
 
   before do
-    Travis.stubs(:env).returns "development"
+    Travis.stubs(:env).returns 'development'
   end
 
   it 'calls the original implementation' do
@@ -49,5 +52,15 @@ describe Travis::Exceptions::Handling do
 
   it 'works with methods that have an arity of 3' do
     object.arity_3(1, 2, 3).should == [1, 2, 3]
+  end
+
+  describe '' do
+    let(:error)   { Class.new(StandardError) }
+    let(:options) { { raise: error } }
+
+    it '' do
+      object.stubs(:inner).raises(error)
+      lambda { object.outer }.should raise_error(error)
+    end
   end
 end

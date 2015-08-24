@@ -10,6 +10,7 @@ module Travis
             method.call(*args, &block)
           rescue options[:from] || Exception => e
             Exceptions.handle(e, options.slice(:backtrace))
+            raise if options[:raise] && Array(options[:raise]).include?(e.class)
           end
         end unless Travis.env == 'test'
       end
