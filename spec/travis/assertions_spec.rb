@@ -1,5 +1,4 @@
-require 'spec_helper'
-require 'travis/support'
+require 'travis/support/assertions'
 
 describe Travis::Assertions do
   class A

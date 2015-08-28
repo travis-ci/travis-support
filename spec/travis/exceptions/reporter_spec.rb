@@ -1,5 +1,5 @@
-require 'spec_helper'
 require 'hashr'
+require 'travis/support/exceptions'
 
 describe Travis::Exceptions::Reporter do
   let(:reporter) { Travis::Exceptions::Reporter.new }
@@ -11,32 +11,32 @@ describe Travis::Exceptions::Reporter do
   end
 
   it "setup a queue" do
-    reporter.queue.should be_instance_of(Queue)
+    expect(reporter.queue).to be_instance_of(Queue)
   end
 
-  it "should loop in a separate thread" do
+  it "loops in a separate thread" do
     reporter.expects(:error_loop)
     reporter.run
     reporter.thread.join
   end
 
-  it "should report an error when something is on the queue" do
+  it "reports an error when something is on the queue" do
     reporter.adapter.expects(:handle)
     reporter.queue.push(error)
     reporter.pop
   end
 
-  it "should not raise an error when pop fails" do
+  it "does not raise an error when pop fails" do
     reporter.queue.expects(:pop).raises(error)
     expect { reporter.pop }.to_not raise_error
   end
 
-  it "should allow pushing an error on the queue" do
+  it "allows pushing an error on the queue" do
     Travis::Exceptions::Reporter.enqueue(error)
-    reporter.queue.pop.should == [error, {}]
+    expect(reporter.queue.pop).to eq([error, {}])
   end
 
-  it "should add custom metadata to raven" do
+  it "adds custom metadata to raven" do
     error.stubs(:metadata).returns('metadata' => 'metadata')
     metadata = reporter.metadata_for(error)
     reporter.adapter.expects(:handle).with(error, { extra: metadata }, {})
@@ -45,7 +45,7 @@ describe Travis::Exceptions::Reporter do
 
   describe 'with no sentry dsn configured' do
     it 'uses the logger adapter' do
-      reporter.adapter.should be_instance_of(Travis::Exceptions::Adapter::Logger)
+      expect(reporter.adapter).to be_instance_of(Travis::Exceptions::Adapter::Logger)
     end
   end
 
@@ -54,7 +54,7 @@ describe Travis::Exceptions::Reporter do
 
     it 'uses the raven adapter' do
       Travis.stubs(:config).returns(config)
-      reporter.adapter.should be_instance_of(Travis::Exceptions::Adapter::Raven)
+      expect(reporter.adapter).to be_instance_of(Travis::Exceptions::Adapter::Raven)
     end
 
     it 'sets the raven adapter up with the required arguments' do

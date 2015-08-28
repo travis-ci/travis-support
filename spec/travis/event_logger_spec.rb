@@ -1,4 +1,3 @@
-require 'spec_helper'
 require 'travis/support/event_logger'
 
 describe Travis::EventLogger do
@@ -30,28 +29,28 @@ describe Travis::EventLogger do
 
     it 'suffixes events with .travis' do
       Travis::EventLogger.notify 'foo'
-      event_name.should be == 'foo.travis'
+      expect(event_name).to eq('foo.travis')
     end
 
     it 'transforms payload into a hash' do
       Travis::EventLogger.notify 'foo', 'bar'
-      data.should be_a(Hash)
-      data[:payload].should be == 'bar'
+      expect(data).to be_a(Hash)
+      expect(data[:payload]).to eq('bar')
     end
 
     it 'does keep the payload as hash' do
       Travis::EventLogger.notify 'foo', :foo => 'bar'
-      data[:foo].should be == 'bar'
+      expect(data[:foo]).to eq('bar')
     end
 
     it 'allows passing in a block for instrumentation' do
       Travis::EventLogger.notify('foo', 'bar') { }
-      args.count.should be == 5
-      data[:instrumented].should == true
+      expect(args.count).to eq(5)
+      expect(data[:instrumented]).to eq(true)
     end
 
     it 'returns the block value' do
-      Travis::EventLogger.notify('foo', 'bar') { 42 }.should be == 42
+      expect(Travis::EventLogger.notify('foo', 'bar') { 42 }).to eq(42)
     end
   end
 
@@ -70,28 +69,28 @@ describe Travis::EventLogger do
 
     it 'sets the full name' do
       Travis::EventLogger.notify 'foo'
-      name.should be == 'foo.travis'
+      expect(name).to eq('foo.travis')
     end
 
     it 'subscribes to child events' do
       Travis::EventLogger.notify 'bar.foo'
-      name.should be == 'bar.foo.travis'
+      expect(name).to eq('bar.foo.travis')
     end
 
     it 'requires a dot for nesting child events' do
       Travis::EventLogger.notify 'barfoo'
-      name.should be_nil
+      expect(name).to be_nil
     end
 
     it 'exposes the payload' do
       Travis::EventLogger.notify 'foo', :bar => 42
-      payload[:bar].should be == 42
+      expect(payload[:bar]).to eq(42)
     end
 
     it 'hands on the event for instrumentation' do
       Travis::EventLogger.notify('foo', 'bar') { }
-      payload[:instrumented].should == true
-      payload[:event].should respond_to(:duration)
+      expect(payload[:instrumented]).to eq(true)
+      expect(payload[:event]).to respond_to(:duration)
     end
   end
 
@@ -113,7 +112,7 @@ describe Travis::EventLogger do
         Travis::EventLogger.notify 'foo'
       end
 
-      payload[:bar].should be == 42
+      expect(payload[:bar]).to eq(42)
     end
 
     it 'works for more than one notification' do
@@ -122,7 +121,7 @@ describe Travis::EventLogger do
         Travis::EventLogger.notify 'foo'
       end
 
-      payload[:bar].should be == 42
+      expect(payload[:bar]).to eq(42)
     end
 
     it 'does not affect other notifications' do
@@ -131,7 +130,7 @@ describe Travis::EventLogger do
       end
 
       Travis::EventLogger.notify 'foo'
-      payload[:bar].should be_nil
+      expect(payload[:bar]).to be_nil
     end
 
     it 'keeps notification payload' do
@@ -139,7 +138,7 @@ describe Travis::EventLogger do
         Travis::EventLogger.notify 'foo', :baz => 1337
       end
 
-      payload[:baz].should be == 1337
+      expect(payload[:baz]).to eq(1337)
     end
 
     it 'prefers notification payload over scope' do
@@ -147,7 +146,7 @@ describe Travis::EventLogger do
         Travis::EventLogger.notify 'foo', :bar => 1337
       end
 
-      payload[:bar].should be == 1337
+      expect(payload[:bar]).to eq(1337)
     end
 
     it 'allows nesting' do
@@ -157,7 +156,7 @@ describe Travis::EventLogger do
         end
       end
 
-      payload.should be == {:a => :a, :b => :b, :c => :c}
+      expect(payload).to eq({:a => :a, :b => :b, :c => :c})
     end
 
     it 'prefers inner scope over outer scope' do
@@ -167,7 +166,7 @@ describe Travis::EventLogger do
         end
       end
 
-      payload[:a].should be == :b
+      expect(payload[:a]).to eq(:b)
     end
   end
 end

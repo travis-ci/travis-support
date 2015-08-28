@@ -1,4 +1,4 @@
-require 'spec_helper'
+require 'travis/support/exceptions'
 
 describe Travis::Exceptions::Adapter::Logger do
   let(:adapter)   { Travis::Exceptions::Adapter::Logger.new }

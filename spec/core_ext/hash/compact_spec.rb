@@ -1,4 +1,3 @@
-require 'spec_helper'
 require 'core_ext/hash/compact'
 
 describe Hash, 'extensions' do
@@ -6,7 +5,7 @@ describe Hash, 'extensions' do
     hash     = { :a => :b, :c => nil }
     expected = { :a => :b }
 
-    hash.compact.should == expected
+    expect(hash.compact).to eq(expected)
   end
 
   it 'compact!' do
@@ -14,6 +13,6 @@ describe Hash, 'extensions' do
     expected = { :a => :b }
 
     hash.compact!
-    hash.should == expected
+    expect(hash).to eq(expected)
   end
 end

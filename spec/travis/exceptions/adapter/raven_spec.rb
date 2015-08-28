@@ -1,5 +1,5 @@
-require 'spec_helper'
 require 'hashr'
+require 'travis/support/exceptions'
 
 describe Travis::Exceptions::Adapter::Raven do
   let(:adapter) { Travis::Exceptions::Adapter::Raven.new(config, logger, env: 'test') }
