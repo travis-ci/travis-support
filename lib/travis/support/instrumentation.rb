@@ -4,6 +4,7 @@ require 'securerandom' # wat
 require 'travis/support/metrics'
 require 'travis/support/instrumentation/instrument'
 require 'travis/support/instrumentation/publisher/log'
+require 'travis/support/instrumentation/publisher/memory'
 
 module Travis
   module Instrumentation
