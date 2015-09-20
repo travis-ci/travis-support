@@ -1,7 +1,7 @@
 language: ruby
 
 rvm:
-  - 1.9.3
+  - 2.1.6
   - jruby-19mode
   - jruby-head
 
@@ -18,9 +18,9 @@ cache: bundler
 
 matrix:
   exclude:
-    - rvm: 1.9.3
+    - rvm: 2.1.6
       jdk: openjdk7
-    - rvm: 1.9.3
+    - rvm: 2.1.6
       jdk: oraclejdk7
     - rvm: jruby-head
       jdk: openjdk6
