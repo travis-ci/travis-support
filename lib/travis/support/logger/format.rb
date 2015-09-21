@@ -21,15 +21,23 @@ module Travis
       end
 
       def format_l2met(severity, time, progname, message)
-        formatted = l2met_format % log_record_vars(severity, time, progname, message).tap do |vars|
-          vars[:message] = vars[:message].to_s.strip.inspect
-        end
+        vars = log_record_vars(severity, time, progname, message)
+
+        l2met_args = {
+          time: vars[:formatted_time],
+          level: vars[:severity_downcase].to_sym,
+          msg: vars[:message].strip
+        }
+
+        l2met_args[:tid] = vars[:thread_id] if config[:thread_id]
+        l2met_args[:pid] = vars[:process_id] if config[:process_id]
+        l2met_args[:app] = vars[:process_name] if ENV['TRAVIS_PROCESS_NAME']
 
         if message.respond_to?(:l2met_args)
-          formatted = append_l2met_args(formatted, message.l2met_args)
+          l2met_args.merge!(message.l2met_args)
         end
 
-        formatted + "\n"
+        l2met_args_to_record(l2met_args).strip + "\n"
       end
 
       def log_record_vars(severity, time, progname, message)
@@ -56,22 +64,21 @@ module Travis
         @time_format ||= config[:time_format]
       end
 
-      def l2met_format
-        @l2met_format ||= ''.tap do |s|
-          s << 'time=%{formatted_time} ' if (time_format || config[:format_type] == 'l2met')
-          s << 'level=%{severity_downcase} '
-          s << 'app=%{process_name} ' if ENV['TRAVIS_PROCESS_NAME']
-          s << 'pid=%{process_id} ' if config[:process_id]
-          s << 'tid=%{thread_id} ' if config[:thread_id]
-          s << 'msg=%{message}'
-        end
-      end
+      def l2met_args_to_record(l2met_args)
+        args = l2met_args.dup
+        ''.tap do |s|
+          %i(time level msg).each do |key|
+            value = args.delete(key)
+            value = value.inspect if value.respond_to?(:=~) && value =~ /\s/
+            s << "#{key}=#{value} "
+          end
 
-      def append_l2met_args(formatted, l2met_args)
-        l2met_args.keys.sort.each do |key|
-          formatted << " #{key}=#{l2met_args[key].inspect}"
+          args.keys.sort.each do |key|
+            value = args[key]
+            value = value.inspect if value.respond_to?(:=~) && value =~ /\s/
+            s << "#{key}=#{value} "
+          end
         end
-        formatted
       end
 
       def traditional_format

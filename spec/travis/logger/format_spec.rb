@@ -91,9 +91,14 @@ describe Travis::Logger::Format do
       expect(log).to include('level=info')
     end
 
+    it 'includes the quoted message' do
+      logger.info('message with spaces')
+      expect(log).to include('msg="message with spaces"')
+    end
+
     it 'includes the message' do
       logger.info('message')
-      expect(log).to include('msg="message"')
+      expect(log).to include('msg=message')
     end
 
     it 'includes the timestamp if config.time_format is given' do
@@ -148,7 +153,7 @@ describe Travis::Logger::Format do
 
     it 'includes arbitrary key=value pairs' do
       logger.info('message', foo: 'bar', energy: 9001)
-      expect(log).to include('foo="bar"')
+      expect(log).to include('foo=bar')
       expect(log).to include('energy=9001')
     end
 
