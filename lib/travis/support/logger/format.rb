@@ -29,7 +29,7 @@ module Travis
           formatted = append_l2met_args(formatted, message.l2met_args)
         end
 
-        formatted
+        formatted + "\n"
       end
 
       def log_record_vars(severity, time, progname, message)
@@ -63,7 +63,7 @@ module Travis
           s << 'app=%{process_name} ' if ENV['TRAVIS_PROCESS_NAME']
           s << 'pid=%{process_id} ' if config[:process_id]
           s << 'tid=%{thread_id} ' if config[:thread_id]
-          s << "msg=%{message}\n"
+          s << 'msg=%{message}'
         end
       end
 
