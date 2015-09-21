@@ -35,6 +35,17 @@ module Travis
 
         msg = msg.join("\n") if msg.respond_to?(:join)
         msg = msg.chomp.split("\n").map { |line| Travis::Logging.prepend_header(line, options) }.join("\n") + "\n"
+
+        options.dup.tap do |opts|
+          opts.delete(:progname)
+
+          class << msg
+            attr_reader :l2met_args
+          end
+
+          msg.instance_variable_set(:@l2met_args, opts)
+        end
+
         super(msg)
       end
     end
