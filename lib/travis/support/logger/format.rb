@@ -67,14 +67,8 @@ module Travis
       def l2met_args_to_record(l2met_args)
         args = l2met_args.dup
         ''.tap do |s|
-          %i(time level msg).each do |key|
+          (%i(time level msg) + (args.keys.sort - %i(time level msg))).each do |key|
             value = args.delete(key)
-            value = value.inspect if value.respond_to?(:=~) && value =~ /\s/
-            s << "#{key}=#{value} "
-          end
-
-          args.keys.sort.each do |key|
-            value = args[key]
             value = value.inspect if value.respond_to?(:=~) && value =~ /\s/
             s << "#{key}=#{value} "
           end
