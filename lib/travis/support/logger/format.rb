@@ -63,7 +63,7 @@ module Travis
           s << 'app=%{process_name} ' if ENV['TRAVIS_PROCESS_NAME']
           s << 'pid=%{process_id} ' if config[:process_id]
           s << 'tid=%{thread_id} ' if config[:thread_id]
-          s << 'msg=%{message}'
+          s << "msg=%{message}\n"
         end
       end
 
