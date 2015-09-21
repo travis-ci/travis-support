@@ -69,7 +69,7 @@ module Travis
         ''.tap do |s|
           (builtin_l2met_args + (args.keys.sort - builtin_l2met_args)).each do |key|
             value = args.delete(key)
-            value = value.inspect if value.respond_to?(:=~) && value =~ /\s/
+            value = value.inspect if value.respond_to?(:include?) && value.include?(' ')
             s << "#{key}=#{value} "
           end
         end
