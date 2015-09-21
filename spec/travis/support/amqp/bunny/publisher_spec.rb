@@ -19,12 +19,12 @@
 #
 #     it "encodes the data as json" do
 #       publisher.publish({})
-#       message.should_not == nil
-#       message[:payload].should == "{}"
+#       expect(message.to_not == nil
+#       expect(message[:payload]).to eq("{}")
 #     end
 #
 #     it "defaults to a direct type" do
-#       publisher.type.should == "direct"
+#       expect(publisher.type).to eq("direct")
 #     end
 #
 #     it "increments a counter when a message is published" do

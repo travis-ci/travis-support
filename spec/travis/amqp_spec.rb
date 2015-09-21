@@ -1,7 +1,4 @@
-require 'spec_helper'
-
 # ouch, no other tests for amqp at all?
-
 if defined?(JRUBY_VERSION)
   describe Travis::Amqp::Consumer do
     describe 'channel prefetch' do

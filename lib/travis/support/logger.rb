@@ -1,4 +1,5 @@
 require 'logger'
+require 'travis/support/logging'
 
 module Travis
   class Logger < ::Logger

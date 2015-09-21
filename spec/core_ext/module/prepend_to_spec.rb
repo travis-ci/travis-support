@@ -1,4 +1,3 @@
-require 'spec_helper'
 require 'core_ext/module/prepend_to'
 
 describe 'Module.prepend_to' do
@@ -27,12 +26,12 @@ describe 'Module.prepend_to' do
   it 'calls the given method first and the original method second' do
     prepend!(:prepended)
     object.foo
-    object.called.should == [:prepended, :original]
+    expect(object.called).to eq([:prepended, :original])
   end
 
   it 'can be called multiple times' do
     1.upto(3) { |n| prepend!(n) }
     object.foo
-    object.called.should == [3, 2, 1, :original]
+    expect(object.called).to eq([3, 2, 1, :original])
   end
 end

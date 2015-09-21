@@ -9,18 +9,11 @@ end
 module Travis
   module Database
     class << self
-      def connect
+      def connect(config = nil)
+        ActiveRecord::Base.establish_connection(config || Travis.config.database)
         ActiveRecord::Base.default_timezone = :utc
         ActiveRecord::Base.logger = Travis.logger
-
-        ActiveRecord::Base.configurations = {
-          Travis.env => Travis.config.database,
-          'logs_database' => Travis.config.logs_database || Travis.config.database
-        }
-
-        ActiveRecord::Base.establish_connection(Travis.env)
       end
     end
   end
 end
-

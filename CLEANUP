@@ -1,0 +1,19 @@
+Extract:
+
+* core-ext to travis-core-ext
+* Amqp to travis-amqp
+* Async to travis-async
+* Database to travis-db
+* Exceptions to travis-exceptions
+* Instrumentation to travis-instrumentation (also move Notification from travis-core)
+* LogSubscriber and Metrics to travis-metrics
+* Logger and Logging to travis-logging
+
+Delete?
+
+* Who uses Assertions?
+* Who uses EventLogger?
+* Who uses Helpers
+* Who uses Memory?
+* Who uses Retryable?
+* Who uses testing/webmock?

@@ -10,9 +10,11 @@ module Travis
         extend ActiveSupport::Concern
 
         included do
-          before :each do
-            Travis::Support::Testing::Webmock.mock!
-            WebMock.disable_net_connect!
+          before do |rspec|
+            unless rspec.metadata[:stub_web].is_a?(FalseClass)
+              Travis::Support::Testing::Webmock.mock!
+              WebMock.disable_net_connect!
+            end
           end
         end
 

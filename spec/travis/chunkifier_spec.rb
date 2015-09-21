@@ -1,6 +1,6 @@
 # encoding: utf-8
-require 'spec_helper'
 require 'json'
+require 'travis/support/chunkifier'
 
 module Travis
   describe Chunkifier do
@@ -26,7 +26,7 @@ module Travis
       its(:parts) { should == ["𤭢abc", "ą"] }
 
       it 'should keep parts under chunk_size taking into account conversion to json and bytes' do
-        subject.parts.map { |p| p.to_json.bytesize }.should == [11, 8]
+        expect(subject.parts.map { |p| p.to_json.bytesize }).to eql [11, 8]
       end
 
     end
@@ -36,13 +36,13 @@ module Travis
       let(:content) { "01\nąąąą" * 1000 }
 
       it 'should keep parts under chunk_size taking into account conversion to json and bytes' do
-        subject.parts.all? { |p| p.to_json.bytesize <= 100 }.should == true
+        expect(subject.parts.all? { |p| p.to_json.bytesize <= 100 }).to eql true
       end
     end
 
     it 'encodes UTF-8 chars' do
       chunkifier = Chunkifier.new("とと", 8, :json => true)
-      chunkifier.parts.length.should == 2
+      expect(chunkifier.parts.length).to eql 2
     end
   end
 end

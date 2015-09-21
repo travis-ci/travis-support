@@ -84,7 +84,7 @@ module Travis
     end
 
     def log_header
-      self.class.log_header ? instance_eval(&self.class.log_header) : self.class.name.split('::').last.downcase
+      self.class.log_header ? instance_eval(&self.class.log_header) : self.class.name.split('::').last.underscore
     end
   end
 end

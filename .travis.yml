@@ -1,7 +1,8 @@
+sudo: false
 language: ruby
 
 rvm:
-  - 1.9.3
+  - 2.2
   - jruby-19mode
   - jruby-head
 
@@ -12,18 +13,18 @@ jdk:
 services:
   - rabbitmq
 
-sudo: false
-
 cache: bundler
 
 matrix:
   exclude:
-    - rvm: 1.9.3
+    - rvm: 2.2
       jdk: openjdk7
-    - rvm: 1.9.3
+    - rvm: 2.2
       jdk: oraclejdk7
     - rvm: jruby-head
       jdk: openjdk6
   allow_failures:
     - rvm: jruby-head
       jdk: openjdk7
+
+script: bundle exec rspec --require spec_helper

@@ -1,5 +1,5 @@
-require 'spec_helper'
 require 'core_ext/module/include'
+require 'travis/support/exceptions'
 
 describe Travis::Exceptions::Handling do
   let(:klass) do
@@ -35,12 +35,12 @@ describe Travis::Exceptions::Handling do
 
   it 'calls the original implementation' do
     object.outer
-    object.called.should == true
+    expect(object.called).to eq(true)
   end
 
   it 'rescues exceptions' do
     object.stubs(:inner).raises(Exception)
-    lambda { object.outer }.should_not raise_error
+    expect { object.outer }.to_not raise_error
   end
 
   it 'sends exceptions to the exception handler' do
@@ -51,7 +51,7 @@ describe Travis::Exceptions::Handling do
   end
 
   it 'works with methods that have an arity of 3' do
-    object.arity_3(1, 2, 3).should == [1, 2, 3]
+    expect(object.arity_3(1, 2, 3)).to eq([1, 2, 3])
   end
 
   describe '' do
@@ -60,7 +60,7 @@ describe Travis::Exceptions::Handling do
 
     it '' do
       object.stubs(:inner).raises(error)
-      lambda { object.outer }.should raise_error(error)
+      expect { object.outer }.to raise_error(error)
     end
   end
 end

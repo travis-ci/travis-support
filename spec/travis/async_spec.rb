@@ -1,5 +1,5 @@
-require 'spec_helper'
 require 'core_ext/module/include'
+require 'travis/support/async'
 
 describe Travis::Async do
   before :each do
@@ -50,7 +50,7 @@ describe Travis::Async do
 
     it "uses the given object's class name as queue name" do
       async_object.new.async_method
-      Travis::Async::Threaded.queues.keys.should == ['Class']
+      expect(Travis::Async::Threaded.queues.keys).to eq(['Class'])
     end
   end
 
@@ -66,13 +66,13 @@ describe Travis::Async do
     it 'enables queueing' do
       Travis::Async.enabled = true
       async_object.new.async_method
-      Travis::Async::Threaded.queues.should_not be_empty
+      expect(Travis::Async::Threaded.queues).to_not be_empty
     end
 
     it 'disables queueing' do
       Travis::Async.enabled = false
       async_object.new.async_method
-      Travis::Async::Threaded.queues.should be_empty
+      expect(Travis::Async::Threaded.queues).to be_empty
     end
   end
 

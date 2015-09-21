@@ -1,5 +1,3 @@
-require 'spec_helper'
-require 'travis/support'
 require 'stringio'
 require 'logger'
 require 'hashr'
@@ -27,17 +25,17 @@ describe Travis::Logging do
   describe 'log' do
     it 'logs before the method call' do
       object.do_something(:foo, :bar)
-      log.should include('about to do_something')
+      expect(log).to include('about to do_something')
     end
 
     it 'logs after the method call' do
       object.do_something(:foo, :bar)
-      log.should include('done: do_something')
+      expect(log).to include('done: do_something')
     end
 
     it 'includes the log header' do
       object.do_something(:foo, :bar)
-      log.should include('header')
+      expect(log).to include('header')
     end
 
     it 'includes the process id' do
@@ -56,13 +54,13 @@ describe Travis::Logging do
 
     it 'logs the exception message' do
       object.log_exception(exception)
-      log.should include('kaputt!')
+      expect(log).to include('kaputt!')
     end
 
     it 'logs the backtrace' do
       object.log_exception(exception)
-      log.should include("line 1")
-      log.should include("line 2")
+      expect(log).to include("line 1")
+      expect(log).to include("line 2")
     end
   end
 end
