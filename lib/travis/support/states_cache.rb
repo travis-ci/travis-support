@@ -73,7 +73,7 @@ module Travis
         build_id = data['id']
         data     = data.to_json
 
-        Travis.logger.info("[states-cache] Writing states cache for repo_id=#{id} branch=#{branch} build_id=#{build_id}")
+        Travis.logger.info("[states-cache] Caching states for repo_id=#{id} branch=#{branch} build_id=#{build_id}")
         set(key(id), data) if update?(id, nil, build_id)
         set(key(id, branch), data) if update?(id, branch, build_id)
       end
@@ -87,8 +87,8 @@ module Travis
         stale      = new_id >= current_id
 
         Travis.logger.info(
-          "[states-cache] Checking if cache is stale for repo_id=#{id} branch=#{branch}. " \
-          "The cache is #{stale ? 'stale' : 'fresh' }, last cached build id=#{current_id}, we're checking build with id=#{new_id}"
+          "[states-cache] repo_id=#{id} branch=#{branch} cache is #{stale ? 'stale' : 'fresh' }, " \
+          "last cached build id=#{current_id}, checked build id=#{new_id}"
         )
 
         return update
