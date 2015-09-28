@@ -39,27 +39,31 @@ module Travis
       alias_method(wrapped, name)
       remove_method(name)
       private(wrapped)
-      class_eval instrumentation_template(name, options[:scope], wrapped, options[:level] || :info)
+      class_eval instrumentation_template(name, options[:scope], wrapped, options[:level] || :info, options[:on])
     end
 
     private
 
-      def instrumentation_template(name, scope, wrapped, level)
-        options = ':target => self, :args => args, :started_at => started_at, :level => ' + level.inspect
-        meter   = 'Travis::Metrics.meter "#{event}:%s", ' + options
-        publish = 'ActiveSupport::Notifications.publish "#{event}:%s", ' + options
+      def instrumentation_template(name, scope, wrapped, level, status)
+        status ||= [:received, :completed, :failed]
+        status   = Array(status) unless status.is_a?(Array)
+
+        options  = 'target: self, args: args, started_at: started_at, level: ' + level.inspect
+        meter    = 'Travis::Metrics.meter "#{event}:%s", ' + options
+        publish  = 'ActiveSupport::Notifications.publish "#{event}:%s", ' + options
+
         <<-RUBY
           def #{name}(*args, &block)
             started_at = Time.now.to_f
             event = self.class.instrumentation_key.dup #{"<< '.' << #{scope}" if scope} << ".#{name}"
-            #{publish % 'received'}
+            #{publish % 'received' if status.include?(:received)}
             result = #{wrapped}(*args, &block)
-            #{meter   % 'completed'}, :finished_at => Time.now.to_f, :result => result
-            #{publish % 'completed'}, :finished_at => Time.now.to_f, :result => result
+            #{"#{meter   % 'completed'}, finished_at: Time.now.to_f, result: result" if status.include?(:completed)}
+            #{"#{publish % 'completed'}, finished_at: Time.now.to_f, result: result" if status.include?(:completed)}
             result
           rescue Exception => e
-            #{meter   % 'failed'}, :exception => [e.class.name, e.message]
-            #{publish % 'failed'}, :exception => [e.class.name, e.message]
+            #{"#{meter   % 'failed'}, exception: [e.class.name, e.message]" if status.include?(:failed)}
+            #{"#{publish % 'failed'}, exception: [e.class.name, e.message]" if status.include?(:failed)}
             raise
           end
         RUBY
