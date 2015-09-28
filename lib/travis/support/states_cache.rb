@@ -87,7 +87,7 @@ module Travis
         stale      = new_id >= current_id
 
         Travis.logger.info(
-          "[states-cache] repo_id=#{id} branch=#{branch} cache is #{stale ? 'stale' : 'fresh' }, " \
+          "[states-cache] cache is #{stale ? 'stale' : 'fresh' }: repo id=#{id} branch=#{branch}, " \
           "last cached build id=#{current_id}, checked build id=#{new_id}"
         )
 

@@ -9,8 +9,6 @@ module Travis
         end
 
         def publish(event)
-          return if ignore?(event)
-
           level = event.key?(:exception) ? :error : :info
           message = event[:message]
           message = "#{message} (#{'%.5f' % event[:duration]}s)" if event[:duration]
@@ -27,20 +25,6 @@ module Travis
 
         def log(level, msg)
           logger.send(level, msg)
-        end
-
-        def ignore?(event)
-          event_received?(event) && !sync_or_request_handler?(event)
-        end
-
-        def event_received?(event)
-          event[:event].end_with?("received")
-        end
-
-        # TODO why do ignore these again?
-        def sync_or_request_handler?(event)
-          msg = event[:message]
-          msg && msg =~ /Travis::Hub::Handler::(Sync|Request)#handle/
         end
       end
     end
