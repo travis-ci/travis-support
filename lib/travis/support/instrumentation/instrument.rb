@@ -49,6 +49,12 @@ module Travis
         payload[:exception] = exception if exception
         Instrumentation.publish(payload)
       end
+
+      private
+
+        def to_pairs(hash)
+          hash.map { |key, value| [key, value].join('=') }.join(' ')
+        end
     end
   end
 end
