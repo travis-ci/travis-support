@@ -56,7 +56,7 @@ module Travis
         exchange.publish(data)
       rescue StandardError => e
         Exceptions.handle(e)
-        nil
+        raise e
       end
 
       def exchange
