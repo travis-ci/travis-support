@@ -16,7 +16,7 @@ module Travis
           config[:ssl]  = true
           config[:tls]  = true
         end
-        @config = config
+        @config = config.tap {|conf| Travis.logger.info(conf.inspect)}
       end
 
       def connected?
