@@ -3,7 +3,7 @@ require 'travis/support/exceptions'
 
 describe Travis::Exceptions::Adapter::Raven do
   let(:adapter) { Travis::Exceptions::Adapter::Raven.new(config, logger, env: 'test') }
-  let(:config)  { Hashr.new(sentry: { dsn: 'https://app.getsentry.com/1', ssl: 'ssl' }) }
+  let(:config)  { { sentry: { dsn: 'https://app.getsentry.com/1', ssl: 'ssl' } } }
   let(:logger)  { stub(error: nil, info: nil, debug: nil, level: Logger::INFO) }
   let(:error)   { StandardError.new('message') }
 

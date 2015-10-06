@@ -1,4 +1,3 @@
-require 'hashr'
 require 'travis/support/logging'
 
 module Travis

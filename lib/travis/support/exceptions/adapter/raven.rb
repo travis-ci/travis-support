@@ -10,8 +10,8 @@ module Travis
           @logger = logger
 
           ::Raven.configure do |c|
-            c.dsn = config.sentry.dsn
-            c.ssl = config.ssl if config.ssl
+            c.dsn    = config[:sentry][:dsn]
+            c.ssl    = config[:ssl] if config[:ssl]
             c.logger = logger
             c.current_environment = options[:env]
           end
