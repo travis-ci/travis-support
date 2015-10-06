@@ -1,4 +1,3 @@
-require 'hashr'
 require 'travis/support/exceptions'
 
 describe Travis::Exceptions::Adapter::Raven do

@@ -1,5 +1,4 @@
 require 'stringio'
-require 'hashr'
 
 describe Travis::Logger do
   let(:io)     { StringIO.new }
@@ -7,7 +6,7 @@ describe Travis::Logger do
   let(:logger) { Travis::Logger.new(io) }
 
   before :each do
-    Travis.stubs(:config).returns(Hashr.new(log_level: :info))
+    Travis.stubs(:config).returns(log_level: :info)
   end
 
   describe '.log_level' do
@@ -17,7 +16,7 @@ describe Travis::Logger do
 
     it 'returns Travis::Worker.config.log_level if defined' do
       Travis.const_set(:Worker, Module.new)
-      Travis::Worker.stubs(:config).returns(Hashr.new(log_level: :info))
+      Travis::Worker.stubs(:config).returns(log_level: :info)
       expect(Travis::Logger.log_level).to eq(:info)
     end
 

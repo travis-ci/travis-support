@@ -1,4 +1,3 @@
-require 'hashr'
 require 'travis/support/exceptions'
 
 describe Travis::Exceptions::Reporter do
@@ -7,7 +6,7 @@ describe Travis::Exceptions::Reporter do
 
   before :each do
     Travis::Exceptions::Reporter.queue = Queue.new
-    Travis.stubs(:config).returns(Hashr.new(sentry: {}))
+    Travis.stubs(:config).returns(sentry: {})
   end
 
   it "setup a queue" do
@@ -50,7 +49,7 @@ describe Travis::Exceptions::Reporter do
   end
 
   describe 'with a sentry dsn configured' do
-    let(:config) { Hashr.new(sentry: { dsn: 'https://app.getsentry.com/1', ssl: 'ssl' }) }
+    let(:config) { { sentry: { dsn: 'https://app.getsentry.com/1', ssl: 'ssl' } } }
 
     it 'uses the raven adapter' do
       Travis.stubs(:config).returns(config)

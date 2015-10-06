@@ -2,7 +2,6 @@ source 'https://rubygems.org'
 
 gem 'activerecord',    '~> 3.2.12'
 gem 'activesupport',   '~> 3.2.12'
-gem 'hashr',           '~> 0.0.20'
 gem 'multi_json'
 gem 'json'
 gem 'gem-patching'

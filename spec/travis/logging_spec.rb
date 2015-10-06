@@ -1,6 +1,5 @@
 require 'stringio'
 require 'logger'
-require 'hashr'
 
 describe Travis::Logging do
   class Foo
@@ -18,7 +17,7 @@ describe Travis::Logging do
   let(:object) { Foo.new }
 
   before :each do
-    Travis.stubs(:config).returns(Hashr.new(log_level: :debug, logger: { process_id: true, thread_id: true }))
+    Travis.stubs(:config).returns(log_level: :debug, logger: { process_id: true, thread_id: true })
     Travis.logger = Travis::Logger.new(io)
   end
 
