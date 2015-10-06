@@ -14,13 +14,13 @@ module Travis
       def initialize(routing_key, options = {})
         @routing_key = routing_key
         @options = options.dup
-        @name = @options.delete(:name) || ""
-        @type = @options.delete(:type) || "direct"
+        @name = @options.delete(:name) || ''
+        @type = @options.delete(:type) || 'direct'
       end
 
       def publish(data, options = {})
         data = MultiJson.encode(data)
-        defaults = { :routing_key => routing_key, :properties => { :message_id => rand(100000000000).to_s } }
+        defaults = { routing_key: routing_key, properties: { message_id: rand(100000000000).to_s } }
         retrying do
           exchange.publish(data, deep_merge(defaults, options))
         end
@@ -29,7 +29,7 @@ module Travis
       protected
 
         def exchange
-          @exchange ||= self.class.channel.exchange(name, :durable => true, :auto_delete => false, :type => type)
+          @exchange ||= self.class.channel.exchange(name, durable: true, auto_delete: false, type: type)
         end
 
         def retrying(&block)
