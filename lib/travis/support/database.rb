@@ -10,7 +10,7 @@ module Travis
   module Database
     class << self
       def connect(config = nil)
-        ActiveRecord::Base.establish_connection(config || Travis.config.database)
+        ActiveRecord::Base.establish_connection(config.try(:to_h) || Travis.config.database.to_h)
         ActiveRecord::Base.default_timezone = :utc
         ActiveRecord::Base.logger = Travis.logger
       end
