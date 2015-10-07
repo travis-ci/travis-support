@@ -7,10 +7,10 @@ module Travis
         def librato
           require 'metriks/librato_metrics_reporter'
           return unless config = Travis.config.librato
-          puts 'Starting Librato Metriks reporter'
           source = Travis.config.librato_source
           source = "#{source}.#{ENV['DYNO']}" if ENV.key?('DYNO')
           on_error = proc {|ex| puts "librato error: #{ex.message} (#{ex.response.body})"}
+          puts "Starting Librato Metriks reporter (source: #{source}, account: #{config.email})"
           Metriks::LibratoMetricsReporter.new(config.email, config.token, source: source, on_error: on_error)
         end
 
