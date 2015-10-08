@@ -82,18 +82,24 @@ module Travis
 
       def update?(id, branch, build_id)
         data = fetch(id, branch)
-        return true unless data
 
-        current_id = data['id'].to_i
-        new_id     = build_id.to_i
-        stale      = new_id >= current_id
-
-        Travis.logger.info(
-          "[states-cache] cache is #{stale ? 'stale' : 'fresh' }: repo id=#{id} branch=#{branch}, " \
-          "last cached build id=#{current_id}, checked build id=#{new_id}"
-        )
-
-        return stale
+        if data
+          last_id = data['id'].to_i
+          stale   = build_id.to_i >= last_id
+          Travis.logger.info(
+            "[states-cache] cache is #{stale ? 'stale' : 'fresh' }: repo id=#{id} branch=#{branch}, " \
+            "last cached build id=#{last_id}, checked build id=#{build_id}"
+          )
+          stale
+        else
+          Travis.logger.info(
+            "[states-cache] cache does not exist: repo id=#{id} branch=#{branch}, " \
+            "checked build id=#{build_id}"
+          )
+          true
+        end
+      rescue => e
+        puts "[states-cache] Exception while checking cache freshness: #{e.message}", e.backtrace
       end
 
       def key(id, branch = nil)
@@ -105,7 +111,9 @@ module Travis
       private
 
       def new_dalli_connection
-        Dalli::Client.new(Travis.config.states_cache.memcached_servers, Travis.config.states_cache.memcached_options)
+        servers = Travis.config.states_cache.memcached_servers
+        options = Travis.config.states_cache.memcached_options || {}
+        Dalli::Client.new(servers, options.to_h)
       end
 
       def get(key)
