@@ -6,6 +6,9 @@ gem 'multi_json'
 gem 'json'
 gem 'gem-patching'
 
+gem 'dalli'
+gem 'connection_pool'
+
 gem 'metriks',         github: 'roidrage/metriks'
 gem 'sentry-raven',    github: 'getsentry/raven-ruby'
 

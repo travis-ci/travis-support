@@ -1,6 +1,8 @@
-require 'dalli'
 require 'connection_pool'
+require 'dalli'
+require 'json'
 require 'active_support/core_ext/module/delegation'
+require 'active_support/core_ext/numeric/time'
 
 module Travis
   class << self
@@ -32,7 +34,7 @@ module Travis
       data['state'].to_sym if data && data['state']
     end
 
-    class TestAdapter
+    class Test
       attr_reader :calls
       def initialize
         @calls = []
@@ -91,7 +93,7 @@ module Travis
           "last cached build id=#{current_id}, checked build id=#{new_id}"
         )
 
-        return update
+        return stale
       end
 
       def key(id, branch = nil)
