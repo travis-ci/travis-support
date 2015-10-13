@@ -16,7 +16,7 @@ module Travis
         end
 
         def adapter
-          Travis.config[:sentry][:dsn] ? Adapter::Raven : Adapter::Logger
+          Exceptions.config[:sentry][:dsn] ? Adapter::Raven : Adapter::Logger
         rescue LoadError => e
           Travis.logger.error 'Could not load raven, falling back to logger for exception reporting'
           Adapter::Logger.new
@@ -51,7 +51,7 @@ module Travis
       end
 
       def adapter
-        @adapter ||= self.class.adapter.new(Travis.config, Travis.logger, env: Travis.env)
+        @adapter ||= self.class.adapter.new(Exceptions.config, Travis.logger, env: Travis.env)
       end
 
       def metadata_for(error)

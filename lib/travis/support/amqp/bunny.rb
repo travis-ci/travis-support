@@ -4,11 +4,17 @@ module Travis
     require 'travis/support/amqp/bunny/consumer'
 
     class << self
+      def setup(config)
+        self.send(:config=, config.to_h, false)
+      end
+
       def config
         @config
       end
 
-      def config=(config)
+      def config=(config, deprecated = true)
+        puts 'Calling Travis::Amqp.config= is deprecated. Call Travis::Amqp.setup(config) instead.' if deprecated
+
         config = config.dup
         config[:user] = config.delete(:username) if config[:username]
         config[:pass] = config.delete(:password) if config[:password]
