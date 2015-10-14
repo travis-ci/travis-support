@@ -5,13 +5,13 @@ module Travis
     require 'travis/support/exceptions/reporter'
 
     class << self
-      def setup(config = nil)
+      def setup(config)
         @config = config.to_h
         Exceptions::Reporter.start
       end
 
       def config
-        puts 'Relying on Travis.config is deprecated: Call Travis::Exceptions.setup(config) instead.'
+        puts 'Relying on Travis.config is deprecated: Call Travis::Exceptions.setup(config) instead.' unless @config
         @config || Travis.config
       end
 
