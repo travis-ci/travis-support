@@ -7,7 +7,7 @@ gem 'multi_json'
 gem 'json',            '~> 1.8.3'
 gem 'gem-patching'
 
-gem 'metriks',         :git => 'https://github.com/roidrage/metriks.git', :ref => 'source'
+gem 'metriks'
 gem 'sentry-raven',    :github => 'getsentry/raven-ruby'
 
 platform :mri do
@@ -31,5 +31,3 @@ group :test do
   gem 'guard'
   gem 'guard-rspec'
 end
-
-
