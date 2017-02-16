@@ -22,6 +22,10 @@ module Travis
      ENV['ENV'] || ENV['RAILS_ENV'] || ENV['RACK_ENV'] || 'development'
     end
 
+    def env?(name)
+      name.to_s == env
+    end
+
     def logger
       @logger ||= Logger.configure(Logger.new(STDOUT))
     end
