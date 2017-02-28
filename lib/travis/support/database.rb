@@ -15,7 +15,8 @@ module Travis
 
         ActiveRecord::Base.configurations = {
           Travis.env => Travis.config.database,
-          'logs_database' => Travis.config.logs_database || Travis.config.database
+          'logs_database' => Travis.config.logs_database || Travis.config.database,
+          'logs_readonly_database' => Travis.config.logs_readonly_database || Travis.config.database
         }
 
         ActiveRecord::Base.establish_connection(Travis.env)
