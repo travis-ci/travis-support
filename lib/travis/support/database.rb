@@ -14,9 +14,12 @@ module Travis
         ActiveRecord::Base.logger = Travis.logger
 
         ActiveRecord::Base.configurations = {
-          Travis.env => Travis.config.database,
-          'logs_database' => Travis.config.logs_database || Travis.config.database
+          Travis.env => Travis.config.database.to_h,
         }
+        
+        if Travis.config.logs_database
+          ActiveRecord::Base.configurations['logs_database'] = Travis.config.logs_database.to_h
+        end
 
         ActiveRecord::Base.establish_connection(Travis.env)
       end
