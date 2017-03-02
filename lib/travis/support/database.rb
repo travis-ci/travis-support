@@ -21,6 +21,10 @@ module Travis
           ActiveRecord::Base.configurations['logs_database'] = Travis.config.logs_database.to_h
         end
 
+        if Travis.config.logs_readonly_database
+          ActiveRecord::Base.configurations['logs_readonly_database'] = Travis.config.logs_readonly_database.to_h
+        end
+
         ActiveRecord::Base.establish_connection(Travis.env)
       end
     end
