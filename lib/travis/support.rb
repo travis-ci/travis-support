@@ -11,7 +11,6 @@ module Travis
   require 'travis/support/log_subscriber'
   require 'travis/support/logger'
   require 'travis/support/logging'
-  require 'travis/support/metrics'
   if RUBY_PLATFORM == 'java'
     require 'travis/support/memory'
   end

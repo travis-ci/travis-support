@@ -2,7 +2,7 @@ require 'active_support/notifications'
 require 'active_support/core_ext/string/inflections'
 # require 'active_support/core_ext/logger' # gone in active_support?
 require 'securerandom' # wat
-require 'travis/support/metrics'
+require 'metriks'
 
 module Travis
   module Instrumentation
@@ -12,8 +12,15 @@ module Travis
       end
 
       def meter(event, options = {})
-        Travis.logger.info "[deprecated] Call Travis::Metrics.meter instead of Travis::Instrumentation.meter."
-        Travis::Metrics.meter(event, options)
+        return if options[:level] == :debug
+
+        started_at, finished_at = options[:started_at], options[:finished_at]
+
+        if finished_at
+          Metriks.timer(event).update(finished_at - started_at)
+        else
+          Metriks.meter(event).mark
+        end
       end
     end
 
@@ -37,7 +44,7 @@ module Travis
 
       def instrumentation_template(name, scope, wrapped, level)
         options = ':target => self, :args => args, :started_at => started_at, :level => ' + level.inspect
-        meter   = 'Travis::Metrics.meter "#{event}:%s", ' + options
+        meter   = 'Travis::Instrumentation.meter "#{event}:%s", ' + options
         publish = 'ActiveSupport::Notifications.publish "#{event}:%s", ' + options
         <<-RUBY
           def #{name}(*args, &block)
