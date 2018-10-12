@@ -3,6 +3,9 @@ module Travis
     require 'travis/support/amqp/bunny/publisher'
     require 'travis/support/amqp/bunny/consumer'
 
+    require 'bunny'
+    require 'patches/bunny_prefetch'
+
     class << self
       def config
         @config
@@ -25,7 +28,6 @@ module Travis
 
       def connection
         @connection ||=  begin
-          require 'bunny'
           bunny = Bunny.new(config, :spec => '09')
           bunny.start
           bunny

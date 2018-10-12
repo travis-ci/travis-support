@@ -4,6 +4,12 @@ require 'metriks'
 module Travis
   module Amqp
     class Publisher
+      class << self
+        def channel
+          @channel ||= Amqp.connection.create_channel
+        end
+      end
+
       attr_reader :name, :type, :routing_key, :options
 
       def initialize(routing_key, options = {})
@@ -11,6 +17,8 @@ module Travis
         @options = options.dup
         @name = @options.delete(:name) || ""
         @type = @options.delete(:type) || "direct"
+        #Bunny 1.7 needs to call create_channel each time
+        @unique_channel = @options.delete(:unique_channel) || (Bunny::VERSION =~ /^(?:1\.(?:7|8|9|\d{2,})\.|[2-9]\d*\.)/)
       end
 
       def publish(data, options = {})
@@ -23,14 +31,19 @@ module Travis
         nil
       end
 
+      #only for compatibility with march_hare
+      def channel
+        @channel ||= @unique_channel ? Amqp.connection.create_channel : self.class.channel
+      end
+
       protected
 
         def default_data
-          { :key => routing_key, :properties => { :message_id => rand(100000000000).to_s } }
+          { :routing_key => routing_key , :properties => { :message_id => rand(100000000000).to_s } }
         end
 
         def exchange
-          @exchange ||= Amqp.connection.exchange(name, :type => type.to_sym, :durable => true, :auto_delete => false)
+          @exchange ||= channel.exchange(name, :type => type.to_sym, :durable => true, :auto_delete => false)
         end
 
         def deep_merge(hash, other)
