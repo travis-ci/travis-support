@@ -56,7 +56,7 @@ module Travis
 
     def too_big?(current_chunk)
       if json?
-        current_chunk = current_chunk.to_s.force_encoding('UTF-8').encode('UTF-8', {:invalid => :replace, :undef => :replace, :replace => '?'})
+        current_chunk = current_chunk.to_s.force_encoding('UTF-8').encode('UTF-8', invalid: :replace, undef: :replace, replace: '?')
         current_chunk = current_chunk.to_json
       end
       current_chunk.bytesize > chunk_size

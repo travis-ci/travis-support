@@ -13,7 +13,7 @@ module Travis
           Travis.uuid = uuid
           eval(target).send(method, *args)
         # rescue Exception => e
-        #   TODO make sure the exception can be caught here, pipe it to raven and
+        #   TODO make sure the exception can be caught here, pipe it to Sentry and
         #   requeue the job appropriately
         end
       end

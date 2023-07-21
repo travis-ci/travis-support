@@ -36,7 +36,7 @@ describe Travis::Exceptions::Reporter do
     reporter.queue.pop.should == [error, {}]
   end
 
-  it "should add custom metadata to raven" do
+  it "should add custom metadata to Sentry" do
     error.stubs(:metadata).returns('metadata' => 'metadata')
     metadata = reporter.metadata_for(error)
     reporter.adapter.expects(:handle).with(error, { extra: metadata }, {})
@@ -52,14 +52,14 @@ describe Travis::Exceptions::Reporter do
   describe 'with a sentry dsn configured' do
     let(:config) { Hashr.new(sentry: { dsn: 'https://app.getsentry.com/1', ssl: 'ssl' }) }
 
-    it 'uses the raven adapter' do
+    it 'uses the sentry adapter' do
       Travis.stubs(:config).returns(config)
-      reporter.adapter.should be_instance_of(Travis::Exceptions::Adapter::Raven)
+      reporter.adapter.should be_instance_of(Travis::Exceptions::Adapter::Sentry)
     end
 
-    it 'sets the raven adapter up with the required arguments' do
+    it 'sets the sentry adapter up with the required arguments' do
       Travis.stubs(:config).returns(config)
-      Travis::Exceptions::Adapter::Raven.expects(:new).with(config, Travis.logger, env: Travis.env)
+      Travis::Exceptions::Adapter::Sentry.expects(:new).with(config, Travis.logger, env: Travis.env)
       reporter.adapter
     end
   end

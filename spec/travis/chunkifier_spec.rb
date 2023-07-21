@@ -21,7 +21,7 @@ module Travis
     end
 
     context 'with UTF-8 chars' do
-      let(:content) { "𤭢abcą" }
+      let(:content) {"𤭢abcą"  }
 
       its(:parts) { should == ["𤭢abc", "ą"] }
 

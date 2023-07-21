@@ -1,5 +1,4 @@
 require 'active_support/core_ext/module/delegation'
-require 'active_support/core_ext/module/aliasing'
 require 'logger'
 
 module Travis
@@ -53,7 +52,8 @@ module Travis
             send(:"#{name}_without_log", *args, &block)
           end
         end
-        alias_method_chain name, 'log'
+        alias_method "#{name}_without_log", name
+        alias_method name, "#{name}_with_log"
       end
     end
 

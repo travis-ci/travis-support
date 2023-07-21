@@ -16,9 +16,9 @@ module Travis
         end
 
         def adapter
-          Travis.config.sentry.dsn ? Adapter::Raven : Adapter::Logger
+          Travis.config.sentry.dsn ? Adapter::Sentry : Adapter::Logger
         rescue LoadError => e
-          Travis.logger.error 'Could not load raven, falling back to logger for exception reporting'
+          Travis.logger.error 'Could not load sentry, falling back to logger for exception reporting'
           Adapter::Logger.new
         end
       end
