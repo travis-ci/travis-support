@@ -10,33 +10,33 @@ describe Travis::Exceptions::Reporter do
     Travis.stubs(:config).returns(Hashr.new(sentry: {}))
   end
 
-  it "setup a queue" do
+  it 'setup a queue' do
     reporter.queue.should be_instance_of(Queue)
   end
 
-  it "should loop in a separate thread" do
+  it 'should loop in a separate thread' do
     reporter.expects(:error_loop)
     reporter.run
     reporter.thread.join
   end
 
-  it "should report an error when something is on the queue" do
+  it 'should report an error when something is on the queue' do
     reporter.adapter.expects(:handle)
     reporter.queue.push(error)
     reporter.pop
   end
 
-  it "should not raise an error when pop fails" do
+  it 'should not raise an error when pop fails' do
     reporter.queue.expects(:pop).raises(error)
     expect { reporter.pop }.to_not raise_error
   end
 
-  it "should allow pushing an error on the queue" do
+  it 'should allow pushing an error on the queue' do
     Travis::Exceptions::Reporter.enqueue(error)
     reporter.queue.pop.should == [error, {}]
   end
 
-  it "should add custom metadata to Sentry" do
+  it 'should add custom metadata to raven' do
     error.stubs(:metadata).returns('metadata' => 'metadata')
     metadata = reporter.metadata_for(error)
     reporter.adapter.expects(:handle).with(error, { extra: metadata }, {})
@@ -50,7 +50,7 @@ describe Travis::Exceptions::Reporter do
   end
 
   describe 'with a sentry dsn configured' do
-    let(:config) { Hashr.new(sentry: { dsn: 'https://app.getsentry.com/1', ssl: 'ssl' }) }
+    let(:config) { JSON.parse({ sentry: { dsn: 'https://app.getsentry.com/1', ssl: 'ssl' } }.to_json, object_class: OpenStruct) }
 
     it 'uses the sentry adapter' do
       Travis.stubs(:config).returns(config)
@@ -64,4 +64,3 @@ describe Travis::Exceptions::Reporter do
     end
   end
 end
-
