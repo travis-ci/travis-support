@@ -33,9 +33,7 @@ module Travis
         l2met_args[:pid] = vars[:process_id] if config[:process_id]
         l2met_args[:app] = vars[:process_name] if ENV['TRAVIS_PROCESS_NAME']
 
-        if message.respond_to?(:l2met_args)
-          l2met_args.merge!(message.l2met_args)
-        end
+        l2met_args.merge!(message.l2met_args) if message.respond_to?(:l2met_args)
 
         l2met_args_to_record(l2met_args).strip + "\n"
       end
@@ -76,17 +74,17 @@ module Travis
       end
 
       def builtin_l2met_args
-        @builtin_l2met_args ||= %w(time level msg).map(&:to_sym)
+        @builtin_l2met_args ||= %w[time level msg].map(&:to_sym)
       end
 
       def traditional_format
         @traditional_format ||= ''.tap do |s|
-          s << '%{formatted_time} ' if time_format
-          s << '%{severity_initial} '
-          s << 'app[%{process_name}]: ' if ENV['TRAVIS_PROCESS_NAME']
-          s << 'PID=%{process_id} ' if config[:process_id]
-          s << 'TID=%{thread_id} ' if config[:thread_id]
-          s << '%{message}'
+          s << '%<formatted_time>s ' if time_format
+          s << '%<severity_initial>s '
+          s << 'app[%<process_name>s]: ' if ENV['TRAVIS_PROCESS_NAME']
+          s << 'PID=%<process_id>s ' if config[:process_id]
+          s << 'TID=%<thread_id>s ' if config[:thread_id]
+          s << '%<message>s'
         end
       end
     end

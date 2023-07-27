@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'active_support'
 require 'webmock'
 require 'webmock/rspec'
@@ -24,38 +26,38 @@ module Travis
           end
 
           def response
-            { :status => 200, :body => body, :headers => {} }
+            { status: 200, body: body, headers: {} }
           end
 
           private
 
-            def body
-              store unless stored?
-              File.read(filename)
-            end
+          def body
+            store unless stored?
+            File.read(filename)
+          end
 
-            def store
-              puts "Storing #{uri.to_s} to #{filename}."
-              `curl -so #{filename} --create-dirs #{uri.to_s}`
-            end
+          def store
+            puts "Storing #{uri} to #{filename}."
+            `curl -so #{filename} --create-dirs #{uri}`
+          end
 
-            def stored?
-              File.exists?(filename)
-            end
+          def stored?
+            File.exist?(filename)
+          end
 
-            def filename
-              @filename ||= "spec/fixtures/github/#{escape(path)}"
-            end
+          def filename
+            @filename ||= "spec/fixtures/github/#{escape(path)}"
+          end
 
-            def path
-              path = uri.path
-              path += "?#{uri.query}" if uri.query
-              "#{uri.host}#{path}.json"
-            end
+          def path
+            path = uri.path
+            path += "?#{uri.query}" if uri.query
+            "#{uri.host}#{path}.json"
+          end
 
-            def escape(path)
-              path.gsub(/[^\w\.\-\/]+/, '_')
-            end
+          def escape(path)
+            path.gsub(%r{[^\w.\-/]+}, '_')
+          end
         end
 
         class << self
@@ -63,7 +65,7 @@ module Travis
 
           def mock!
             @requests = {}
-            WebMock.stub_request(:get, %r(https?://(?!127.0.0.1|localhost))).to_return do |request|
+            WebMock.stub_request(:get, %r{https?://(?!127.0.0.1|localhost)}).to_return do |request|
               uri = request.uri
               request = MockRequest.new(uri)
               @requests[uri] = request

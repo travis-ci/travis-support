@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Kernel
   def run_periodically(interval, &block)
     Thread.new do

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Travis
   class AssertionFailed < RuntimeError
     attr_reader :object, :method
@@ -9,7 +11,7 @@ module Travis
     end
 
     def message
-      @message ? @message : "#{object.inspect}##{method} did not return true."
+      @message || "#{object.inspect}##{method} did not return true."
     end
   end
 

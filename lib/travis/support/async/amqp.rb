@@ -1,17 +1,18 @@
+# frozen_string_literal: true
+
 module Travis
   module Async
     module Amqp
       class << self
-        def run(target, method, options, *args)
+        def run(_target, _method, options, *args)
           type, data, options = *args
-          publisher.publish(:type => type, :data => data, :options => options)
+          publisher.publish(type: type, data: data, options: options)
         end
 
-        def publisher(queue)
-          Travis::Amqp::Publisher.new(('tasks'))
+        def publisher(_queue)
+          Travis::Amqp::Publisher.new('tasks')
         end
       end
     end
   end
 end
-

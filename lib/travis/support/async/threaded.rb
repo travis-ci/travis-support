@@ -1,11 +1,10 @@
-require 'thread'
+# frozen_string_literal: true
 
 module Travis
   module Async
     module Threaded
       class Queue
-        attr_reader :name
-        attr_reader :items
+        attr_reader :name, :items
 
         def initialize(name)
           @name  = name
@@ -30,7 +29,7 @@ module Travis
         def run(target, method, options, *args, &block)
           uuid = Travis.uuid
           queue = queue(options[:queue])
-          queue << lambda { call(uuid, target, method, *args, &block) }
+          queue << -> { call(uuid, target, method, *args, &block) }
           Travis.logger.info "[#{Thread.current.object_id}] Queue #{queue.name} size: #{queue.size}"
         end
 

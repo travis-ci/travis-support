@@ -1,11 +1,13 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Travis::Exceptions::Adapter::Logger do
-  let(:adapter)   { Travis::Exceptions::Adapter::Logger.new }
+  let(:adapter)   { described_class.new }
   let(:logger)    { stub(error: nil) }
   let(:error)     { StandardError.new('message') }
 
-  before :each do
+  before do
     Travis.stubs(:logger).returns(logger)
   end
 

@@ -1,15 +1,17 @@
+# frozen_string_literal: true
+
 require 'active_record'
 
 class Travis::MethodNeedsToBeOverridenError < StandardError; end
 
 class ActiveRecord::Base
   SQL = {
-    :floor => {
+    floor: {
       'postgresql' => 'floor(%s::float)',
-      'mysql'      => 'floor(%s)',
-      'sqlite3'    => 'round(%s - 0.5)'
+      'mysql' => 'floor(%s)',
+      'sqlite3' => 'round(%s - 0.5)'
     }
-  }
+  }.freeze
 
   def to_json(*)
     raise Travis::MethodNeedsToBeOverridenError
@@ -24,7 +26,7 @@ class ActiveRecord::Base
       SQL[:floor][adapter] % field
     end
 
-    # TODO extract this to somewhere else and use Travis.config.env instead
+    # TODO: extract this to somewhere else and use Travis.config.env instead
     def adapter
       env = defined?(Rails) && Rails.respond_to?(:env) ? Rails.env : ENV['ENV'] || ENV['RAILS_ENV'] || 'test'
       adapter = configurations[env]['adapter']
@@ -32,4 +34,3 @@ class ActiveRecord::Base
     end
   end
 end
-

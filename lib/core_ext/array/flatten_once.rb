@@ -1,7 +1,10 @@
-class Array
-  def flatten_once
-    # TODO: replace all calls to flatten_once with flatten(1)
-    flatten(1)
-  end unless method_defined?(:flatten_once)
-end
+# frozen_string_literal: true
 
+class Array
+  unless method_defined?(:flatten_once)
+    def flatten_once
+      # TODO: replace all calls to flatten_once with flatten(1)
+      flatten(1)
+    end
+  end
+end

@@ -3,10 +3,10 @@ require 'core_ext/active_record/base'
 
 describe ActiveRecord::Base, 'extensions' do
   describe 'floor' do
-    subject { ActiveRecord::Base }
+    subject { described_class }
 
     def using(adapter)
-      subject.stubs(:configurations).returns('test' => { 'adapter' => adapter})
+      subject.stubs(:configurations).returns('test' => { 'adapter' => adapter })
     end
 
     it 'returns an sql snippet for postgres' do

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'travis/support'
 require 'stringio'
@@ -10,8 +12,7 @@ describe Travis::Logging do
 
     log_header { 'header' }
 
-    def do_something(*args)
-    end
+    def do_something(*args); end
     log :do_something
   end
 
@@ -19,7 +20,7 @@ describe Travis::Logging do
   let(:log)    { io.string }
   let(:object) { Foo.new }
 
-  before :each do
+  before do
     Travis.stubs(:config).returns(Hashr.new(log_level: :debug, logger: { process_id: true, thread_id: true }))
     Travis.logger = Travis::Logger.new(io)
   end
@@ -61,8 +62,8 @@ describe Travis::Logging do
 
     it 'logs the backtrace' do
       object.log_exception(exception)
-      log.should include("line 1")
-      log.should include("line 2")
+      log.should include('line 1')
+      log.should include('line 2')
     end
   end
 end

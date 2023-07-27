@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'active_support/notifications'
 require 'active_support/core_ext/string/inflections'
 # require 'active_support/core_ext/logger' # gone in active_support?
@@ -8,13 +10,14 @@ module Travis
   module Instrumentation
     class << self
       def setup
-        Travis.logger.info "[deprecated] Travis::Instrumentation.setup now does nothing. Call Travis::Metrics.setup instead."
+        Travis.logger.info '[deprecated] Travis::Instrumentation.setup now does nothing. Call Travis::Metrics.setup instead.'
       end
 
       def meter(event, options = {})
         return if options[:level] == :debug
 
-        started_at, finished_at = options[:started_at], options[:finished_at]
+        started_at = options[:started_at]
+        finished_at = options[:finished_at]
 
         if finished_at
           Metriks.timer(event).update(finished_at - started_at)
@@ -42,11 +45,11 @@ module Travis
 
     private
 
-      def instrumentation_template(name, scope, wrapped, level)
-        options = ':target => self, :args => args, :started_at => started_at, :level => ' + level.inspect
-        meter   = 'Travis::Instrumentation.meter "#{event}:%s", ' + options
-        publish = 'ActiveSupport::Notifications.publish "#{event}:%s", ' + options
-        <<-RUBY
+    def instrumentation_template(name, scope, wrapped, level)
+      options = ':target => self, :args => args, :started_at => started_at, :level => ' + level.inspect
+      meter   = 'Travis::Instrumentation.meter "#{event}:%s", ' + options
+      publish = 'ActiveSupport::Notifications.publish "#{event}:%s", ' + options
+      <<-RUBY
           def #{name}(*args, &block)
             started_at = Time.now.to_f
             event = self.class.instrumentation_key.dup #{"<< '.' << #{scope}" if scope} << ".#{name}"
@@ -60,7 +63,7 @@ module Travis
             #{publish % 'failed'}, :exception => [e.class.name, e.message]
             raise
           end
-        RUBY
-      end
+      RUBY
+    end
   end
 end

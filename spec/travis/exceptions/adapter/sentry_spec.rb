@@ -1,13 +1,15 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'hashr'
 
 describe Travis::Exceptions::Adapter::Sentry do
-  let(:adapter) { Travis::Exceptions::Adapter::Sentry.new(config, logger, env: 'test') }
+  let(:adapter) { described_class.new(config, logger, env: 'test') }
   let(:config)  { Hashr.new(sentry: { dsn: 'https://app.getsentry.com/1', ssl: 'ssl' }) }
   let(:logger)  { stub(error: nil, info: nil, debug: nil, level: Logger::INFO) }
   let(:error)   { StandardError.new('message') }
 
-  before :each do
+  before do
     Sentry.stubs(:capture_exception)
   end
 
@@ -33,4 +35,3 @@ describe Travis::Exceptions::Adapter::Sentry do
     adapter.handle(error)
   end
 end
-

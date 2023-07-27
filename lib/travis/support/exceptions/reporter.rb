@@ -1,4 +1,5 @@
-require 'thread'
+# frozen_string_literal: true
+
 require 'active_support/core_ext/class/attribute'
 
 module Travis
@@ -29,16 +30,16 @@ module Travis
       attr_accessor :thread
 
       def run
-        @thread = Thread.new &method(:error_loop)
+        @thread = Thread.new(&method(:error_loop))
       end
 
       def error_loop
-        loop &method(:pop)
+        loop(&method(:pop))
       end
 
       def pop
         handle(*queue.pop)
-      rescue => e
+      rescue StandardError => e
       end
 
       def handle(error, options = {})
@@ -60,4 +61,3 @@ module Travis
     end
   end
 end
-

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Module
   class Preloader
     attr_reader :only_patterns, :only_names, :skip_patterns, :skip_names, :debug
@@ -11,23 +13,23 @@ class Module
         thing.is_a?(Regexp)
       end
 
-      @skip_patterns, @skip_names = skip.partition &partition
-      @only_patterns, @only_names = only.partition &partition
+      @skip_patterns, @skip_names = skip.partition(&partition)
+      @only_patterns, @only_names = only.partition(&partition)
     end
 
     def load_constants(const)
       const.constants.each do |name|
         full_name = [const.name, name].join('::')
-        if only?(full_name) && !skip?(full_name)
-          skip_names << full_name
-          puts "preloading #{full_name}" if debug
-          child = begin
-            const.const_get(name)
-          rescue NameError => e
-            eval("#{const}::#{name}")
-          end
-          load_constants(child) if loadable?(child)
+        next unless only?(full_name) && !skip?(full_name)
+
+        skip_names << full_name
+        puts "preloading #{full_name}" if debug
+        child = begin
+          const.const_get(name)
+        rescue NameError => e
+          eval("#{const}::#{name}")
         end
+        load_constants(child) if loadable?(child)
       end
     end
 

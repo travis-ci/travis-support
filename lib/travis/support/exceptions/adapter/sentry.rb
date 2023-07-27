@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'sentry-ruby'
 
 module Travis
@@ -17,18 +19,18 @@ module Travis
           end
         end
 
-        def handle(error, metadata = {}, options = {})
+        def handle(error, metadata = {}, _options = {})
           logger.error(message_for(error))
           ::Sentry.capture_exception(error, metadata)
         end
 
         private
 
-          def message_for(error)
-            lines = ["Error: #{error.message}"]
-            lines += error.backtrace ? error.backtrace : [] if logger.level == ::Logger::DEBUG
-            lines.join("\n")
-          end
+        def message_for(error)
+          lines = ["Error: #{error.message}"]
+          lines += error.backtrace || [] if logger.level == ::Logger::DEBUG
+          lines.join("\n")
+        end
       end
     end
   end

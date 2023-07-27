@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 amqp = RUBY_PLATFORM == 'java' ? 'march_hare' : 'bunny'
 require "travis/support/amqp/#{amqp}"
 
@@ -21,7 +23,7 @@ Travis::Amqp::Consumer.class_eval do
     end
 
     def replies
-      new('replies') # TODO can't create a queue worker.replies?
+      new('replies') # TODO: can't create a queue worker.replies?
     end
 
     def workers
@@ -33,7 +35,7 @@ end
 Travis::Amqp::Publisher.class_eval do
   class << self
     def configure
-      new('builds.configure', :auto_recovery => true)
+      new('builds.configure', auto_recovery: true)
     end
 
     def builds(routing_key)
@@ -41,7 +43,7 @@ Travis::Amqp::Publisher.class_eval do
     end
 
     def jobs(routing_key)
-      new("reporting.jobs.#{routing_key}", :type => 'topic', :name => 'reporting')
+      new("reporting.jobs.#{routing_key}", type: 'topic', name: 'reporting')
     end
 
     def commands
@@ -49,7 +51,7 @@ Travis::Amqp::Publisher.class_eval do
     end
 
     def replies
-      new('replies') # TODO can't create a queue worker.replies?
+      new('replies') # TODO: can't create a queue worker.replies?
     end
 
     def workers

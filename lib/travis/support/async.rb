@@ -1,4 +1,5 @@
-require 'thread'
+# frozen_string_literal: true
+
 require 'core_ext/module/prepend_to'
 
 module Travis
@@ -18,7 +19,9 @@ module Travis
         if enabled?
           options[:queue] ||= target.is_a?(Module) ? target.name : target.class.name
           strategy = strategy(options.delete(:use))
-          puts "Enqueueing target: #{target}, method: #{method} to #{options[:queue]} using #{strategy}" if options[:debug] || Travis.respond_to?(:config) && Travis.config.log_level == :debug
+          if options[:debug] || Travis.respond_to?(:config) && Travis.config.log_level == :debug
+            puts "Enqueueing target: #{target}, method: #{method} to #{options[:queue]} using #{strategy}"
+          end
           strategy.run(target, method, options, *args, &block)
         elsif method.is_a?(Method)
           method.call(*args, &block)
@@ -46,4 +49,3 @@ module Travis
     end
   end
 end
-
