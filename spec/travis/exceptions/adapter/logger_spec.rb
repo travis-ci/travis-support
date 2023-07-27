@@ -23,7 +23,7 @@ describe Travis::Exceptions::Adapter::Logger do
     adapter.handle(error)
   end
 
-  it 'logs the message' do
+  it 'logs the messages' do
     logger.expects(:error).with(['foo: foo'])
     adapter.handle(error, extra: { foo: 'foo' })
   end

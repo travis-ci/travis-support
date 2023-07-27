@@ -6,7 +6,7 @@ module Travis
       class << self
         def run(_target, _method, options, *args)
           type, data, options = *args
-          publisher.publish(type: type, data: data, options: options)
+          publisher.publish(type:, data:, options:)
         end
 
         def publisher(_queue)

@@ -5,7 +5,7 @@ module Travis
   describe Chunkifier do
     let(:chunk_size) { 15 }
     let(:chunk_split_size) { 1 }
-    let(:subject) { Chunkifier.new(content, chunk_size, json: true, chunk_split_size:) }
+    let(:subject) { described_class.new(content, chunk_size, json: true, chunk_split_size:) }
 
     context 'with newlines' do
       let(:content) { "01\n234501\n234501\n2345" }
@@ -25,7 +25,7 @@ module Travis
 
       its(:parts) { should == %w[𤭢abc ą] }
 
-      it 'should keep parts under chunk_size taking into account conversion to json and bytes' do
+      it 'keeps parts under chunk_size taking into account conversion to json and bytes' do
         subject.parts.map { |p| p.to_json.bytesize }.should == [9, 4]
       end
     end
@@ -34,13 +34,13 @@ module Travis
       let(:chunk_size) { 100 }
       let(:content) { "01\nąąąą" * 1000 }
 
-      it 'should keep parts under chunk_size taking into account conversion to json and bytes' do
+      it 'keeps parts under chunk_size taking into account conversion to json and bytes' do
         subject.parts.all? { |p| p.to_json.bytesize <= 100 }.should == true
       end
     end
 
     it 'encodes UTF-8 chars' do
-      chunkifier = Chunkifier.new('とと', 6, json: true)
+      chunkifier = described_class.new('とと', 6, json: true)
       chunkifier.parts.length.should == 2
     end
   end

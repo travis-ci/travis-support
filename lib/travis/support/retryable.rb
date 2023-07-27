@@ -17,7 +17,7 @@ module Travis
       begin
         yield
       rescue *opts[:on]
-        if (opts[:tries] -= 1) > 0
+        if (opts[:tries] -= 1).positive?
           sleep opts[:sleep].to_f if opts[:sleep]
           retry
         end

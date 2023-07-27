@@ -10,8 +10,8 @@ class Hash
           key
         end || key] = case value
                       when Array
-                        value.map do |value|
-                          value.is_a?(Hash) ? value.deep_symbolize_keys : value
+                        value.map do |v|
+                          v.is_a?(Hash) ? v.deep_symbolize_keys : v
                         end
                       when Hash
                         value.deep_symbolize_keys

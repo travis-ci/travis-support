@@ -13,7 +13,7 @@ module Travis
         queue: { durable: true, exclusive: false },
         channel: { prefetch: 1 },
         exchange: { name: nil, routing_key: nil }
-      }
+      }.freeze
 
       attr_reader :name, :options, :subscription
 

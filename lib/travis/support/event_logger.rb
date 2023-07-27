@@ -60,7 +60,7 @@ module Travis
     #     end
     #   end
     def notify(event, payload = {}, &block)
-      payload = { payload: payload } unless payload.is_a?(Hash)
+      payload = { payload: } unless payload.is_a?(Hash)
       EventLogger.notify(event, payload.merge(subject: self), &block)
     end
 
@@ -69,7 +69,7 @@ module Travis
     # Sends an notification suffixed with .travis and with scope values being injected.
     # If a block is passed, it will use instrumentation.
     def self.notify(event, payload = {}, &block)
-      payload = { payload: payload } unless payload.is_a?(Hash)
+      payload = { payload: } unless payload.is_a?(Hash)
       payload = scope.merge payload
       event   = "#{event}.travis"
       if block

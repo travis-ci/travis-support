@@ -22,7 +22,7 @@ module Travis
 
       def publish(data, options = {})
         data = MultiJson.encode(data)
-        defaults = { routing_key: routing_key, properties: { message_id: rand(100_000_000_000).to_s } }
+        defaults = { routing_key:, properties: { message_id: rand(100_000_000_000).to_s } }
         retrying do
           exchange.publish(data, deep_merge(defaults, options))
         end
@@ -31,7 +31,7 @@ module Travis
       protected
 
       def exchange
-        @exchange ||= self.class.channel.exchange(name, durable: true, auto_delete: false, type: type)
+        @exchange ||= self.class.channel.exchange(name, durable: true, auto_delete: false, type:)
       end
 
       def retrying(&block)

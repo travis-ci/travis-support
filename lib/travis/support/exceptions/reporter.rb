@@ -18,7 +18,7 @@ module Travis
 
         def adapter
           Travis.config.sentry.dsn ? Adapter::Sentry : Adapter::Logger
-        rescue LoadError => e
+        rescue LoadError
           Travis.logger.error 'Could not load sentry, falling back to logger for exception reporting'
           Adapter::Logger.new
         end
@@ -39,7 +39,7 @@ module Travis
 
       def pop
         handle(*queue.pop)
-      rescue StandardError => e
+      rescue StandardError
       end
 
       def handle(error, options = {})

@@ -17,7 +17,8 @@ describe Travis::Exceptions::Handling do
       end
       rescues :outer, options
 
-      def inner # so there's something we can stub for raising
+      # so there's something we can stub for raising
+      def inner
         @called = true
       end
 

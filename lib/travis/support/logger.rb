@@ -15,7 +15,7 @@ module Travis
       end
 
       def log_level
-        config && config.log_level || :debug
+        config&.log_level || :debug
       end
 
       def config

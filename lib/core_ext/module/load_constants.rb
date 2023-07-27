@@ -26,7 +26,7 @@ class Module
         puts "preloading #{full_name}" if debug
         child = begin
           const.const_get(name)
-        rescue NameError => e
+        rescue NameError
           eval("#{const}::#{name}")
         end
         load_constants(child) if loadable?(child)
@@ -38,7 +38,7 @@ class Module
     end
 
     def only?(name)
-      (only_names.length == 0 && only_patterns.length == 0) ||
+      (only_names.empty? && only_patterns.empty?) ||
         only_names.include?(name) || only_patterns.any? { |pattern| pattern =~ name }
     end
 

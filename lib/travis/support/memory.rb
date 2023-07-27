@@ -16,12 +16,10 @@ module Travis
 
     def report_periodically
       run_periodically(60) do
-        begin
-          log
-          meter
-        rescue Exception => e
-          puts e.message, e.backtrace
-        end
+        log
+        meter
+      rescue Exception => e
+        puts e.message, e.backtrace
       end
     end
 
@@ -40,7 +38,7 @@ module Travis
     private
 
     def stats
-      { heap: heap, non_heap: non_heap, waiting: waiting }
+      { heap:, non_heap:, waiting: }
     end
 
     def heap

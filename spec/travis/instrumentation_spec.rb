@@ -62,7 +62,7 @@ describe Travis::Instrumentation do
       args[:finished_at].should be_a(Float)
     end
 
-    it 'sends completed events' do
+    it 'sends all completed events' do
       object.stubs(:inner).raises(StandardError, 'I FAIL!')
       begin
         object.tracked('foo')
@@ -95,14 +95,14 @@ describe Travis::Instrumentation do
 
     it 'use the child class name as the instrumentation key by default' do
       object.tracked('foo')
-      key, args = events.first
+      key, = events.first
       key.should == 'travis.something.baz.tracked:received'
     end
 
     it 'can overwrite the instrumentation key' do
       child.instrumentation_key = 'travis.something.else'
       object.tracked('foo')
-      key, args = events.first
+      key, = events.first
       key.should == 'travis.something.else.baz.tracked:received'
     end
   end

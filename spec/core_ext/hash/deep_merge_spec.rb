@@ -1,7 +1,9 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'core_ext/hash/deep_merge'
 
-describe 'Hash#deep_merge' do
+context 'when Hash#deep_merge' do
   it 'deep merges a hash into a new one' do
     lft = { foo: { bar: 'bar' } }
     rgt = { foo: { baz: 'baz' } }
@@ -16,7 +18,7 @@ describe 'Hash#deep_merge' do
   end
 end
 
-describe 'Hash#deep_merge!' do
+context 'when Hash#deep_merge!' do
   it 'deep merges a hash into self' do
     lft = { foo: { bar: 'bar' } }
     rgt = { foo: { baz: 'baz' } }

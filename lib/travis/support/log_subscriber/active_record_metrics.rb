@@ -10,7 +10,7 @@ module Travis
       end
 
       def sql(event)
-        return if 'SCHEMA' == event.payload[:name]
+        return if event.payload[:name] == 'SCHEMA'
 
         name = event.payload[:name]
         sql = event.payload[:sql].downcase

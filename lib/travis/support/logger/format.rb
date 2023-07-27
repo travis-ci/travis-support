@@ -35,7 +35,7 @@ module Travis
 
         l2met_args.merge!(message.l2met_args) if message.respond_to?(:l2met_args)
 
-        l2met_args_to_record(l2met_args).strip + "\n"
+        "#{l2met_args_to_record(l2met_args).strip}\n"
       end
 
       def log_record_vars(severity, time, progname, message)
@@ -43,12 +43,12 @@ module Travis
           message: message.to_s,
           process_id: Process.pid,
           process_name: ENV['TRAVIS_PROCESS_NAME'],
-          progname: progname,
-          severity: severity,
+          progname:,
+          severity:,
           severity_downcase: severity.downcase,
           severity_initial: severity[0, 1],
           thread_id: Thread.current.object_id,
-          time: time
+          time:
         }.tap do |v|
           if time_format
             v[:formatted_time] = time.strftime(time_format)

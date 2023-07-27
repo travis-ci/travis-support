@@ -46,7 +46,7 @@ module Travis
     private
 
     def instrumentation_template(name, scope, wrapped, level)
-      options = ':target => self, :args => args, :started_at => started_at, :level => ' + level.inspect
+      options = ":target => self, :args => args, :started_at => started_at, :level => #{level.inspect}"
       meter   = 'Travis::Instrumentation.meter "#{event}:%s", ' + options
       publish = 'ActiveSupport::Notifications.publish "#{event}:%s", ' + options
       <<-RUBY

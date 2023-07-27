@@ -2,7 +2,7 @@
 
 module Travis
   module Helpers
-    extend self
+    module_function
 
     def obfuscate_env_vars(line)
       regex = /(?<=\=)(?:(?<q>['"]).*?[^\\]\k<q>|(.*?)(?= \w+=|$))/

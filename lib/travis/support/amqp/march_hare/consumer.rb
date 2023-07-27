@@ -16,7 +16,7 @@ module Travis
         queue: { durable: true, exclusive: false },
         channel: { prefetch: 1 },
         exchange: { name: nil, routing_key: nil }
-      }
+      }.freeze
 
       attr_reader :name, :options, :subscription
 
@@ -42,7 +42,7 @@ module Travis
         @queue ||= channel.queue(name, options.queue).tap do |queue|
           if options.exchange.name
             routing_key = options.exchange.routing_key || name
-            queue.bind(options.exchange.name, routing_key: routing_key)
+            queue.bind(options.exchange.name, routing_key:)
           end
         end
       end

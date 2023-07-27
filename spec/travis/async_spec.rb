@@ -13,33 +13,6 @@ describe Travis::Async do
     described_class::Threaded.queues.clear
   end
 
-  describe 'declaring a method as async' do
-    let(:async_sleep) do
-      Class.new do
-        extend Travis::Async
-
-        attr_accessor :done
-
-        def initialize
-          @done = Hash[*(1..5).map { |queue| [queue, 0] }.flatten]
-        end
-
-        def total_done
-          done.values.inject(&:+)
-        end
-
-        1.upto(5) do |queue|
-          define_method(:"sleep_in_queue_#{queue}") do |seconds|
-            sleep(seconds)
-            done[queue] ||= 0
-            done[queue] += 1
-          end
-          async :"sleep_in_queue_#{queue}", queue: queue
-        end
-      end
-    end
-  end
-
   describe 'queue name' do
     let(:async_object) do
       Class.new do

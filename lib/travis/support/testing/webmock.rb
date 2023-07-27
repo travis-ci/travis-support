@@ -26,7 +26,7 @@ module Travis
           end
 
           def response
-            { status: 200, body: body, headers: {} }
+            { status: 200, body:, headers: {} }
           end
 
           private

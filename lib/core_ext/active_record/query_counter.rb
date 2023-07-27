@@ -23,10 +23,9 @@ module ActiveRecord
     end
 
     def ignore?(values)
-      'CACHE' == values[:name] || IGNORE.any? { |r| values[:sql].strip =~ r }.freeze
+      values[:name] == 'CACHE' || IGNORE.any? { |r| values[:sql].strip =~ r }.freeze
     end
 
-    extend self
     ActiveSupport::Notifications.subscribe('sql.active_record', self)
   end
 end

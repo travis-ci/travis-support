@@ -9,7 +9,7 @@ if defined?(JRUBY_VERSION)
     describe 'channel prefetch' do
       let(:consumer)   { described_class.new('queue', options) }
       let(:queue)      { stub('queue', bind: nil, subscribe: nil) }
-      let(:channel)    { stub('channel', queue: queue, :prefetch= => nil) }
+      let(:channel)    { stub('channel', queue:, :prefetch= => nil) }
       let(:connection) { stub('connection', create_channel: channel) }
 
       before do

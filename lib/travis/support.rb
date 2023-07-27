@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'securerandom'
 require 'core_ext/securerandom'
 
@@ -24,7 +26,7 @@ module Travis
     end
 
     def logger
-      @logger ||= Logger.configure(Logger.new(STDOUT))
+      @logger ||= Logger.configure(Logger.new($stdout))
     end
 
     def logger=(logger)

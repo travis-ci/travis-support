@@ -23,7 +23,7 @@ module Travis
       class << self
         def setup(url, options = {})
           ::Sidekiq.configure_client do |c|
-            c.redis = { url: url, namespace: options[:namespace], size: options[:pool_size] }
+            c.redis = { url:, namespace: options[:namespace], size: options[:pool_size] }
           end
         end
 

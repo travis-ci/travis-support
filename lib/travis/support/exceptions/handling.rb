@@ -10,12 +10,10 @@ module Travis
         return if Travis.env == 'test'
 
         prepend_to(name) do |_object, method, *args, &block|
-          begin
-            method.call(*args, &block)
-          rescue options[:from] || Exception => e
-            Exceptions.handle(e, options.slice(:backtrace))
-            raise if options[:raise] && Array(options[:raise]).include?(e.class)
-          end
+          method.call(*args, &block)
+        rescue options[:from] || Exception => e
+          Exceptions.handle(e, options.slice(:backtrace))
+          raise if options[:raise] && Array(options[:raise]).include?(e.class)
         end
       end
     end
