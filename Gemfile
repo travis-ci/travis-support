@@ -15,7 +15,7 @@ gem 'sentry-sidekiq'
 platform :mri do
   gem 'amq-client',    '>= 1.0.4'
   gem 'amqp',          '>= 1.8.0'
-  gem 'bunny',         '>= 1.7.0'
+  gem 'bunny',         '>= 2.22.0'
 end
 
 platform :jruby do
@@ -27,7 +27,7 @@ end
 group :test do
   gem 'guard'
   gem 'guard-rspec'
-  gem 'mocha', '~> 1.2', '>= 1.2.1'
+  gem 'mocha', '~> 2.1.0'
   gem 'rake', '>= 13'
   gem 'rspec', '~> 3.12.0'
   gem 'rspec-its', '~> 1.3.0'
