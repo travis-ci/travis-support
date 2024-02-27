@@ -1,4 +1,5 @@
-require 'thread'
+# frozen_string_literal: true
+
 require 'active_support/core_ext/class/attribute'
 
 module Travis
@@ -16,9 +17,9 @@ module Travis
         end
 
         def adapter
-          Travis.config.sentry.dsn ? Adapter::Raven : Adapter::Logger
-        rescue LoadError => e
-          Travis.logger.error 'Could not load raven, falling back to logger for exception reporting'
+          Travis.config.sentry.dsn ? Adapter::Sentry : Adapter::Logger
+        rescue LoadError
+          Travis.logger.error 'Could not load sentry, falling back to logger for exception reporting'
           Adapter::Logger.new
         end
       end
@@ -29,16 +30,16 @@ module Travis
       attr_accessor :thread
 
       def run
-        @thread = Thread.new &method(:error_loop)
+        @thread = Thread.new(&method(:error_loop))
       end
 
       def error_loop
-        loop &method(:pop)
+        loop(&method(:pop))
       end
 
       def pop
         handle(*queue.pop)
-      rescue => e
+      rescue StandardError
       end
 
       def handle(error, options = {})
@@ -60,4 +61,3 @@ module Travis
     end
   end
 end
-

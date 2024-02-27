@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'active_record'
 
 # will be added in rails 4, doing it more properly
@@ -8,5 +10,3 @@ ActiveRecord::Base.class_eval do
     limit(0)
   end
 end
-
-

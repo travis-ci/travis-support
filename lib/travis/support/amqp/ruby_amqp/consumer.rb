@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'hashr'
 require 'travis/support/logging'
 
@@ -7,11 +9,11 @@ module Travis
       include Logging
 
       DEFAULTS = {
-        :subscribe => { :ack => false, :blocking => false },
-        :queue     => { :durable => true, :exclusive => false },
-        :channel   => { :prefetch => 1 },
-        :exchange  => { :name => nil, :routing_key => nil }
-      }
+        subscribe: { ack: false, blocking: false },
+        queue: { durable: true, exclusive: false },
+        channel: { prefetch: 1 },
+        exchange: { name: nil, routing_key: nil }
+      }.freeze
 
       attr_reader :name, :options, :subscription
 
@@ -33,25 +35,27 @@ module Travis
 
       protected
 
-        def queue
-          @queue ||= channel.queue(name, options.queue)
+      def queue
+        @queue ||= channel.queue(name, options.queue)
 
-          @queue ||= begin
-            queue = channel.queue(name, options.queue)
-            if options.exchange.name
-              routing_key = options.exchange.routing_key || name
-              queue.bind(options.exchange.name, :key => routing_key)
-            end
+        @queue ||= begin
+          queue = channel.queue(name, options.queue)
+          if options.exchange.name
+            routing_key = options.exchange.routing_key || name
+            queue.bind(options.exchange.name, key: routing_key)
           end
         end
+      end
 
-        def channel
-          @channel ||= AMQP::Channel.new(Amqp.connection).prefetch(Travis.config.amqp.prefetch)
-        end
+      def channel
+        @channel ||= AMQP::Channel.new(Amqp.connection).prefetch(Travis.config.amqp.prefetch)
+      end
 
-        def deep_merge(hash, other)
-          hash.merge(other, &(merger = proc { |key, v1, v2| Hash === v1 && Hash === v2 ? v1.merge(v2, &merger) : v2 }))
-        end
+      def deep_merge(hash, other)
+        hash.merge(other, &(merger = proc { |_key, v1, v2|
+                              v1.is_a?(Hash) && v2.is_a?(Hash) ? v1.merge(v2, &merger) : v2
+                            }))
+      end
     end
   end
 end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'core_ext/module/include'
 
@@ -15,7 +17,8 @@ describe Travis::Exceptions::Handling do
       end
       rescues :outer, options
 
-      def inner # so there's something we can stub for raising
+      # so there's something we can stub for raising
+      def inner
         @called = true
       end
 
@@ -40,7 +43,7 @@ describe Travis::Exceptions::Handling do
 
   it 'rescues exceptions' do
     object.stubs(:inner).raises(Exception)
-    lambda { object.outer }.should_not raise_error
+    -> { object.outer }.should_not raise_error
   end
 
   it 'sends exceptions to the exception handler' do
@@ -60,7 +63,7 @@ describe Travis::Exceptions::Handling do
 
     it '' do
       object.stubs(:inner).raises(error)
-      lambda { object.outer }.should raise_error(error)
+      -> { object.outer }.should raise_error(error)
     end
   end
 end

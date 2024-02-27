@@ -1,12 +1,12 @@
+# frozen_string_literal: true
+
 module Travis
   module Amqp
     require 'travis/support/amqp/bunny/publisher'
     require 'travis/support/amqp/bunny/consumer'
 
     class << self
-      def config
-        @config
-      end
+      attr_reader :config
 
       def config=(config)
         config = config.dup
@@ -24,20 +24,20 @@ module Travis
       end
 
       def connection
-        @connection ||=  begin
+        @connection ||= begin
           require 'bunny'
-          bunny = Bunny.new(config, :spec => '09')
+          bunny = Bunny.new(config, spec: '09')
           bunny.start
           bunny
         end
       end
-      alias :connect :connection
+      alias connect connection
 
       def disconnect
-        if connection
-          connection.close if connection.open?
-          @connection = nil
-        end
+        return unless connection
+
+        connection.close if connection.open?
+        @connection = nil
       end
     end
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Travis
   module Exceptions
     module Adapter
@@ -10,7 +12,7 @@ module Travis
 
         def handle(error, metadata = {}, options = {})
           logger.error error.message
-          logger.error metadata[:extra].map { |key, value| "#{key}: #{value}" } if metadata[:extra]
+          logger.error(metadata[:extra].map { |key, value| "#{key}: #{value}" }) if metadata[:extra]
           logger.error error.backtrace unless options[:backtrace].is_a?(FalseClass)
         end
       end

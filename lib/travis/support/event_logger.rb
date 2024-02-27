@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'securerandom' # ActiveSupport::Notifications needs this but fails to require it
 require 'active_support/notifications'
 
@@ -58,8 +60,8 @@ module Travis
     #     end
     #   end
     def notify(event, payload = {}, &block)
-      payload = {:payload => payload} unless Hash === payload
-      EventLogger.notify(event, payload.merge(:subject => self), &block)
+      payload = { payload: } unless payload.is_a?(Hash)
+      EventLogger.notify(event, payload.merge(subject: self), &block)
     end
 
     private :notify
@@ -67,7 +69,7 @@ module Travis
     # Sends an notification suffixed with .travis and with scope values being injected.
     # If a block is passed, it will use instrumentation.
     def self.notify(event, payload = {}, &block)
-      payload = {:payload => payload} unless Hash === payload
+      payload = { payload: } unless payload.is_a?(Hash)
       payload = scope.merge payload
       event   = "#{event}.travis"
       if block
@@ -82,9 +84,11 @@ module Travis
     # Automatically captures any prefixed notifirstions.
     def self.subscribe(event = '')
       raise LocalJumpError, 'no block given' unless block_given?
+
       event = Regexp.escape(event) unless event.is_a? Regexp
       ActiveSupport::Notifications.subscribe(/^(?:.*\.)?#{event}\.travis$/) do |*args|
-        name, payload = args.first, args.last
+        name = args.first
+        payload = args.last
         payload[:event] ||= ActiveSupport::Notifications::Event.new(*args) if payload[:instrumented]
         yield name, payload
       end
@@ -94,6 +98,7 @@ module Travis
     def self.scope(inject = {})
       scope = Thread.current[:'Travis::EventLogger.scope'] ||= {}
       return scope unless block_given?
+
       Thread.current[:'Travis::EventLogger.scope'] = scope.merge(inject)
       yield
     ensure
@@ -101,4 +106,3 @@ module Travis
     end
   end
 end
-

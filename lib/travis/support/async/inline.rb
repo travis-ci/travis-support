@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 module Travis
   module Async
     module Inline
       class << self
-        def run(target, method, options, *args, &block)
+        def run(target, method, _options, *args, &block)
           method.is_a?(Method) ? method.call(*args, &block) : target.send(method, *args, &block)
         rescue Exception => e
           puts "Exception caught in #{name}.call. Exceptions should be caught in client code"

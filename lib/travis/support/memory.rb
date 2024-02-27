@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'java'
 require 'metriks'
 require 'core_ext/kernel/run_periodically'
@@ -14,59 +16,57 @@ module Travis
 
     def report_periodically
       run_periodically(60) do
-        begin
-          log
-          meter
-        rescue Exception => e
-          puts e.message, e.backtrace
-        end
+        log
+        meter
+      rescue Exception => e
+        puts e.message, e.backtrace
       end
     end
 
     def log
       stats.each do |key, value|
-        puts "[memory] #{key}: #{value.to_s}"
+        puts "[memory] #{key}: #{value}"
       end
     end
 
     def meter
-      [:used, :committed].each do |key|
+      %i[used committed].each do |key|
         Metriks.meter("v1.travis.#{app}.memory.heap.#{key}").mark(heap.send(key))
       end
     end
 
     private
 
-      def stats
-        { :heap => heap, :non_heap => non_heap, :waiting => waiting }
-      end
+    def stats
+      { heap:, non_heap:, waiting: }
+    end
 
-      def heap
-        memory_manager.heap_memory_usage
-      end
+    def heap
+      memory_manager.heap_memory_usage
+    end
 
-      def non_heap
-        memory_manager.non_heap_memory_usage
-      end
+    def non_heap
+      memory_manager.non_heap_memory_usage
+    end
 
-      def waiting
-        memory_manager.object_pending_finalization_count
-      end
+    def waiting
+      memory_manager.object_pending_finalization_count
+    end
 
-      def memory_manager
-        @memory_manager ||= ManagementFactory.memoryMXBean
-      end
+    def memory_manager
+      @memory_manager ||= ManagementFactory.memoryMXBean
+    end
 
-      # def gc_beans
-      #   @gc_beans ||= ManagementFactory.garbageCollectorMXBeans
-      # end
+    # def gc_beans
+    #   @gc_beans ||= ManagementFactory.garbageCollectorMXBeans
+    # end
 
-      # def memory_managers
-      #   ManagementFactory.memory_manager_mxbeans
-      # end
+    # def memory_managers
+    #   ManagementFactory.memory_manager_mxbeans
+    # end
 
-      # def memory_pools
-      #   ManagementFactory.memory_pool_mxbeans
-      # end
+    # def memory_pools
+    #   ManagementFactory.memory_pool_mxbeans
+    # end
   end
 end

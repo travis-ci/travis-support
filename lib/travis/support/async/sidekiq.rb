@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 begin
   require 'sidekiq'
 rescue LoadError
@@ -12,16 +14,16 @@ module Travis
         def perform(uuid, target, method, *args)
           Travis.uuid = uuid
           eval(target).send(method, *args)
-        # rescue Exception => e
-        #   TODO make sure the exception can be caught here, pipe it to raven and
-        #   requeue the job appropriately
+          # rescue Exception => e
+          #   TODO make sure the exception can be caught here, pipe it to Sentry and
+          #   requeue the job appropriately
         end
       end
 
       class << self
         def setup(url, options = {})
           ::Sidekiq.configure_client do |c|
-            c.redis = { :url => url, :namespace => options[:namespace], :size => options[:pool_size] }
+            c.redis = { url:, namespace: options[:namespace], size: options[:pool_size] }
           end
         end
 

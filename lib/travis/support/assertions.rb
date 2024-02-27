@@ -1,4 +1,4 @@
-require 'active_support/core_ext/module/aliasing'
+# frozen_string_literal: true
 
 module Travis
   class AssertionFailed < RuntimeError
@@ -11,7 +11,7 @@ module Travis
     end
 
     def message
-      @message ? @message : "#{object.inspect}##{method} did not return true."
+      @message || "#{object.inspect}##{method} did not return true."
     end
   end
 
@@ -22,7 +22,8 @@ module Travis
           raise Travis::AssertionFailed.new(self, name, message) unless result
         end
       end
-      alias_method_chain name, 'assert'
+      alias_method "#{name}_without_assert", name
+      alias_method name, "#{name}_with_assert"
     end
   end
 end

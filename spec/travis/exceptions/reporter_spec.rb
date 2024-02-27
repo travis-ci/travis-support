@@ -1,42 +1,44 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'hashr'
 
 describe Travis::Exceptions::Reporter do
-  let(:reporter) { Travis::Exceptions::Reporter.new }
+  let(:reporter) { described_class.new }
   let(:error)    { StandardError.new }
 
-  before :each do
-    Travis::Exceptions::Reporter.queue = Queue.new
+  before do
+    described_class.queue = Queue.new
     Travis.stubs(:config).returns(Hashr.new(sentry: {}))
   end
 
-  it "setup a queue" do
+  it 'setup a queue' do
     reporter.queue.should be_instance_of(Queue)
   end
 
-  it "should loop in a separate thread" do
+  it 'loops in a separate thread' do
     reporter.expects(:error_loop)
     reporter.run
     reporter.thread.join
   end
 
-  it "should report an error when something is on the queue" do
+  it 'reports an error when something is on the queue' do
     reporter.adapter.expects(:handle)
     reporter.queue.push(error)
     reporter.pop
   end
 
-  it "should not raise an error when pop fails" do
+  it 'does not raise an error when pop fails' do
     reporter.queue.expects(:pop).raises(error)
-    expect { reporter.pop }.to_not raise_error
+    expect { reporter.pop }.not_to raise_error
   end
 
-  it "should allow pushing an error on the queue" do
-    Travis::Exceptions::Reporter.enqueue(error)
+  it 'allows pushing an error on the queue' do
+    described_class.enqueue(error)
     reporter.queue.pop.should == [error, {}]
   end
 
-  it "should add custom metadata to raven" do
+  it 'adds custom metadata to raven' do
     error.stubs(:metadata).returns('metadata' => 'metadata')
     metadata = reporter.metadata_for(error)
     reporter.adapter.expects(:handle).with(error, { extra: metadata }, {})
@@ -50,18 +52,17 @@ describe Travis::Exceptions::Reporter do
   end
 
   describe 'with a sentry dsn configured' do
-    let(:config) { Hashr.new(sentry: { dsn: 'https://app.getsentry.com/1', ssl: 'ssl' }) }
+    let(:config) { JSON.parse({ sentry: { dsn: 'https://app.getsentry.com/1', ssl: 'ssl' } }.to_json, object_class: OpenStruct) }
 
-    it 'uses the raven adapter' do
+    it 'uses the sentry adapter' do
       Travis.stubs(:config).returns(config)
-      reporter.adapter.should be_instance_of(Travis::Exceptions::Adapter::Raven)
+      reporter.adapter.should be_instance_of(Travis::Exceptions::Adapter::Sentry)
     end
 
-    it 'sets the raven adapter up with the required arguments' do
+    it 'sets the sentry adapter up with the required arguments' do
       Travis.stubs(:config).returns(config)
-      Travis::Exceptions::Adapter::Raven.expects(:new).with(config, Travis.logger, env: Travis.env)
+      Travis::Exceptions::Adapter::Sentry.expects(:new).with(config, Travis.logger, env: Travis.env)
       reporter.adapter
     end
   end
 end
-

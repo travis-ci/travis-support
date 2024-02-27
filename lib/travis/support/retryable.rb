@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Travis
   module Retryable
     # Retries a given block a specified number of times in the
@@ -9,13 +11,13 @@ module Travis
     #
     # This code is pretty much directly 'borrowed' from vagrant,
     # a project which made Travis possible! :)
-    def retryable(opts=nil)
-      opts = { :tries => 1, :on => Exception }.merge(opts || {})
+    def retryable(opts = nil)
+      opts = { tries: 1, on: Exception }.merge(opts || {})
 
       begin
-        return yield
+        yield
       rescue *opts[:on]
-        if (opts[:tries] -= 1) > 0
+        if (opts[:tries] -= 1).positive?
           sleep opts[:sleep].to_f if opts[:sleep]
           retry
         end

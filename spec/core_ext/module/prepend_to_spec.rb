@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'core_ext/module/prepend_to'
 
@@ -8,7 +10,7 @@ describe 'Module.prepend_to' do
         @called ||= []
       end
 
-      def foo(*args)
+      def foo(*_args)
         called << :original
       end
     end
@@ -27,7 +29,7 @@ describe 'Module.prepend_to' do
   it 'calls the given method first and the original method second' do
     prepend!(:prepended)
     object.foo
-    object.called.should == [:prepended, :original]
+    object.called.should == %i[prepended original]
   end
 
   it 'can be called multiple times' do

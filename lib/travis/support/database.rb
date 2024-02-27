@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 begin
   require 'active_record'
   require 'erb'
@@ -17,4 +19,3 @@ module Travis
     end
   end
 end
-

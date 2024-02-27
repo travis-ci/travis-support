@@ -42,7 +42,7 @@ module Travis
         end
       end
 
-      chunks << current_chunk if current_chunk.length > 0
+      chunks << current_chunk if current_chunk.length.positive?
 
       chunks
     end
@@ -50,13 +50,14 @@ module Travis
     def chunk_split_size
       @chunk_split_size || begin
         size = chunk_size / 10
-        size == 0 ? 1 : size
+        size.zero? ? 1 : size
       end
     end
 
     def too_big?(current_chunk)
       if json?
-        current_chunk = current_chunk.to_s.force_encoding('UTF-8').encode('UTF-8', {:invalid => :replace, :undef => :replace, :replace => '?'})
+        current_chunk = current_chunk.to_s.force_encoding('UTF-8').encode('UTF-8', invalid: :replace, undef: :replace,
+                                                                                   replace: '?')
         current_chunk = current_chunk.to_json
       end
       current_chunk.bytesize > chunk_size

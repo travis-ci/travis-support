@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'travis/support'
 require 'stringio'
@@ -5,11 +7,11 @@ require 'stringio'
 describe Travis::Logger::Format do
   let(:io) { StringIO.new }
   let(:log) { io.string }
-  let(:formatter) { Travis::Logger::Format.new }
+  let(:formatter) { described_class.new }
   let(:logger) { Travis::Logger.new(io).tap { |logger| logger.formatter = formatter } }
 
-  context 'when using traditional format' do
-    before :each do
+  describe 'when using traditional format' do
+    before do
       ENV.delete('TRAVIS_PROCESS_NAME')
     end
 
@@ -24,40 +26,42 @@ describe Travis::Logger::Format do
     end
 
     it 'includes the timestamp if config.time_format is given' do
-      logger.formatter = Travis::Logger::Format.new(time_format: '%Y-%m-%dT%H:%M:%S.%6N%:z')
+      logger.formatter = described_class.new(time_format: '%Y-%m-%dT%H:%M:%S.%6N%:z')
       logger.info('message')
-      log.should =~ /^[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2}\.[\d]{6}[\-\+][\d]{2}:[\d]{2}/
+      log.should =~ /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}[-+]\d{2}:\d{2}/
     end
 
     it 'does not include the timestamp if config.time_format is not given' do
       logger.info('message')
-      log.should_not =~ /^[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2}\.[\d]{6}[\-\+][\d]{2}:[\d]{2}/
+      log.should_not =~ /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}[-+]\d{2}:\d{2}/
     end
 
-    it 'includes the current thread id if config.thread_id is given' do
-      logger.formatter = Travis::Logger::Format.new(thread_id: true)
-      logger.info('message')
-      log.should include(Thread.current.object_id.to_s)
+    context 'when thread_id is used' do
+      it 'includes the current thread id when config.thread_id is provided' do
+        logger.formatter = described_class.new(thread_id: true)
+        logger.info('message')
+        log.should include(Thread.current.object_id.to_s)
+      end
+
+      it 'does not include the thread id when thread_id is not provided' do
+        logger.info('message')
+        log.should_not include(Thread.current.object_id.to_s)
+      end
     end
 
-    it 'does not include the current thread id if config.thread_id is not given' do
-      logger.info('message')
-      log.should_not include(Thread.current.object_id.to_s)
-    end
-
-    it 'includes the current process id if config.process_id is given' do
-      logger.formatter = Travis::Logger::Format.new(process_id: true)
+    it 'includes the current process id when config.process_id is provided' do
+      logger.formatter = described_class.new(process_id: true)
       logger.info('message')
       log.should include(Process.pid.to_s)
     end
 
-    it 'does not include the current process id if config.process_id is not given' do
+    it 'does not include the current process id when config.process_id is not provided' do
       logger.info('message')
       log.should_not include(Process.pid.to_s)
     end
 
     it 'includes the current thread id if config.thread_id is given' do
-      logger.formatter = Travis::Logger::Format.new(thread_id: true)
+      logger.formatter = described_class.new(thread_id: true)
       logger.info('message')
       log.should include(Thread.current.object_id.to_s)
     end
@@ -80,9 +84,9 @@ describe Travis::Logger::Format do
   end
 
   context 'when using l2met format' do
-    let(:formatter) { Travis::Logger::Format.new(format_type: 'l2met') }
+    let(:formatter) { described_class.new(format_type: 'l2met') }
 
-    before :each do
+    before do
       ENV.delete('TRAVIS_PROCESS_NAME')
     end
 
@@ -102,47 +106,49 @@ describe Travis::Logger::Format do
     end
 
     it 'includes the timestamp if config.time_format is given' do
-      logger.formatter = Travis::Logger::Format.new(format_type: 'l2met', time_format: '%Y-%m-%dT%H:%M:%S.%6N%:z')
+      logger.formatter = described_class.new(format_type: 'l2met', time_format: '%Y-%m-%dT%H:%M:%S.%6N%:z')
       logger.info('message')
-      expect(log).to match(/time=[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2}\.[\d]{6}[\-\+][\d]{2}:[\d]{2}/)
+      expect(log).to match(/time=\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{6}[-+]\d{2}:\d{2}/)
     end
 
     it 'includes the timestamp as iso8601 if config.time_format is not given' do
       logger.info('message')
-      expect(log).to match(/time=[\d]{4}-[\d]{2}-[\d]{2}T[\d]{2}:[\d]{2}:[\d]{2}[\-\+][\d]{2}:[\d]{2}/)
+      expect(log).to match(/time=\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}[-+]\d{2}:\d{2}/)
     end
 
-    it 'includes the current thread id if config.thread_id is given' do
-      logger.formatter = Travis::Logger::Format.new(format_type: 'l2met', thread_id: true)
-      logger.info('message')
-      expect(log).to include("tid=#{Thread.current.object_id}")
-    end
+    context 'when thread_id is used' do
+      it 'includes the current thread id if config.thread_id is given' do
+        logger.formatter = described_class.new(format_type: 'l2met', thread_id: true)
+        logger.info('message')
+        expect(log).to include("tid=#{Thread.current.object_id}")
+      end
 
-    it 'does not include the current thread id if config.thread_id is not given' do
-      logger.info('message')
-      expect(log).to_not include("tid=#{Thread.current.object_id}")
+      it 'does not include the current thread id if config.thread_id is not given' do
+        logger.info('message')
+        expect(log).not_to include("tid=#{Thread.current.object_id}")
+      end
     end
 
     it 'includes the current process id if config.process_id is given' do
-      logger.formatter = Travis::Logger::Format.new(format_type: 'l2met', process_id: true)
+      logger.formatter = described_class.new(format_type: 'l2met', process_id: true)
       logger.info('message')
       expect(log).to include("pid=#{Process.pid}")
     end
 
     it 'does not include the current process id if config.process_id is not given' do
       logger.info('message')
-      expect(log).to_not include("pid=#{Process.pid}")
+      expect(log).not_to include("pid=#{Process.pid}")
     end
 
     it 'includes the current thread id if config.thread_id is given' do
-      logger.formatter = Travis::Logger::Format.new(format_type: 'l2met', thread_id: true)
+      logger.formatter = described_class.new(format_type: 'l2met', thread_id: true)
       logger.info('message')
       expect(log).to include("tid=#{Thread.current.object_id}")
     end
 
     it 'does not include the current thread id if config.thread_id is not given' do
       logger.info('message')
-      expect(log).to_not include("tid=#{Thread.current.object_id}")
+      expect(log).not_to include("tid=#{Thread.current.object_id}")
     end
 
     it 'includes the process name if ENV["TRAVIS_PROCESS_NAME"] is present' do
@@ -159,7 +165,7 @@ describe Travis::Logger::Format do
 
     it 'does not include the process name if ENV["TRAVIS_PROCESS_NAME"] is not present' do
       logger.info('message')
-      expect(log).to_not include('app=hub.1')
+      expect(log).not_to include('app=hub.1')
     end
   end
 end

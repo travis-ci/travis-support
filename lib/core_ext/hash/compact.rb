@@ -1,12 +1,16 @@
-class Hash
-  def compact
-    dup.compact!
-  end
+# frozen_string_literal: true
 
-  def compact!
-    keys.each do |key|
-      delete(key) if self[key].nil?
+unless {}.respond_to?(:compact)
+  class Hash
+    def compact
+      dup.compact!
     end
-    self
+
+    def compact!
+      keys.each do |key|
+        delete(key) if self[key].nil?
+      end
+      self
+    end
   end
-end unless {}.respond_to?(:compact)
+end

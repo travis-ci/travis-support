@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'logger'
 
 module Travis
@@ -13,7 +15,7 @@ module Travis
       end
 
       def log_level
-        config && config.log_level || :debug
+        config&.log_level || :debug
       end
 
       def config
@@ -25,7 +27,7 @@ module Travis
       end
     end
 
-    [:fatal, :error, :warn, :info, :debug].each do |level|
+    %i[fatal error warn info debug].each do |level|
       define_method(level) do |msg, options = {}|
         if msg.is_a?(Exception)
           exception = msg

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'securerandom'
 require 'core_ext/securerandom'
 
@@ -11,14 +13,12 @@ module Travis
   require 'travis/support/log_subscriber'
   require 'travis/support/logger'
   require 'travis/support/logging'
-  if RUBY_PLATFORM == 'java'
-    require 'travis/support/memory'
-  end
+  require 'travis/support/memory' if RUBY_PLATFORM == 'java'
   require 'travis/support/retryable'
 
   class << self
     def env
-     ENV['ENV'] || ENV['RAILS_ENV'] || ENV['RACK_ENV'] || 'development'
+      ENV['ENV'] || ENV['RAILS_ENV'] || ENV['RACK_ENV'] || 'development'
     end
 
     def env?(name)
@@ -26,7 +26,7 @@ module Travis
     end
 
     def logger
-      @logger ||= Logger.configure(Logger.new(STDOUT))
+      @logger ||= Logger.configure(Logger.new($stdout))
     end
 
     def logger=(logger)
